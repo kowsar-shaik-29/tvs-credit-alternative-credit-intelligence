@@ -1,0 +1,53 @@
+# Environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Sensitive environment configuration (keep .env.example)
+.env
+.env.*
+!.env.example
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Notebook Checkpoints & Cache
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# Node / Web artifacts (if any)
+node_modules/
+dist/
+build/
+
+# Logs and temporary files
+*.log
+logs/
+tmp/
+temp/
+scratch/
+
+# Large Training Datasets (not required for production inference)
+*.csv
+backend/data/*.csv
+!backend/data/.gitkeep
+
+# Operating system files
+desktop.ini

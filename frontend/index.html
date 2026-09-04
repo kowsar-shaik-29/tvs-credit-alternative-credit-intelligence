@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TVS Credit - Alternative Credit Intelligence | NIRNAY</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-container">
+      <div class="brand">
+        <div class="logo-badge">TVS</div>
+        <div class="brand-text">
+          <h1>TVS CREDIT</h1>
+          <span class="sub-brand">NIRNAY • Alternative Credit Intelligence</span>
+        </div>
+      </div>
+      <div class="header-status">
+        <span class="status-indicator online"></span>
+        <span id="backend-status-text">Checking Backend...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container main-content">
+    <div class="hero-section">
+      <h2>Credit Risk Assessment & Alternative Underwriting</h2>
+      <p>Evaluate applicant default probability, financial stability index, and automated approval decisions using the Enhanced Random Forest intelligence model.</p>
+    </div>
+
+    <!-- Alert / Message Banner -->
+    <div id="alert-box" class="alert-box hidden"></div>
+
+    <div class="dashboard-grid">
+      <!-- Left Column: Application Form -->
+      <section class="card form-card">
+        <div class="card-header">
+          <h3>Loan Application Profile</h3>
+          <button type="button" id="btn-autofill" class="btn btn-secondary btn-sm">
+            ⚡ Fill Known Notebook Customer
+          </button>
+        </div>
+
+        <form id="risk-assessment-form" class="app-form">
+          <!-- Section 1: Demographics -->
+          <div class="form-section-title">1. Applicant Demographics</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="age">Age (Years)</label>
+              <input type="number" id="age" name="age" min="18" max="100" value="30" required>
+            </div>
+            <div class="form-group">
+              <label for="education">Education</label>
+              <select id="education" name="education" required>
+                <option value="Bachelor's" selected>Bachelor's</option>
+                <option value="Master's">Master's</option>
+                <option value="High School">High School</option>
+                <option value="PhD">PhD</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="marital_status">Marital Status</label>
+              <select id="marital_status" name="marital_status" required>
+                <option value="Single" selected>Single</option>
+                <option value="Married">Married</option>
+                <option value="Divorced">Divorced</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Section 2: Financial & Employment -->
+          <div class="form-section-title">2. Financial & Employment Profile</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="income">Annual Income (₹ / $)</label>
+              <input type="number" id="income" name="income" min="0" step="1000" value="50000" required>
+            </div>
+            <div class="form-group">
+              <label for="employment_type">Employment Type</label>
+              <select id="employment_type" name="employment_type" required>
+                <option value="Full-time" selected>Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Self-employed">Self-employed</option>
+                <option value="Unemployed">Unemployed</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="months_employed">Months Employed</label>
+              <input type="number" id="months_employed" name="months_employed" min="0" value="36" required>
+            </div>
+          </div>
+
+          <!-- Section 3: Loan Request Details -->
+          <div class="form-section-title">3. Loan Request Details</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="loan_amount">Requested Loan Amount</label>
+              <input type="number" id="loan_amount" name="loan_amount" min="1000" step="1000" value="40000" required>
+            </div>
+            <div class="form-group">
+              <label for="interest_rate">Interest Rate (%)</label>
+              <input type="number" id="interest_rate" name="interest_rate" min="0" max="40" step="0.1" value="10.0" required>
+            </div>
+            <div class="form-group">
+              <label for="loan_term">Loan Term (Months)</label>
+              <input type="number" id="loan_term" name="loan_term" min="6" max="120" value="36" required>
+            </div>
+            <div class="form-group">
+              <label for="loan_purpose">Loan Purpose</label>
+              <select id="loan_purpose" name="loan_purpose" required>
+                <option value="Home" selected>Home</option>
+                <option value="Auto">Auto</option>
+                <option value="Business">Business</option>
+                <option value="Education">Education</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Section 4: Credit History & Obligations -->
+          <div class="form-section-title">4. Credit History & Obligations</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="credit_score">Bureau Credit Score (300-850)</label>
+              <input type="number" id="credit_score" name="credit_score" min="300" max="850" value="650" required>
+            </div>
+            <div class="form-group">
+              <label for="num_credit_lines">Active Credit Lines</label>
+              <input type="number" id="num_credit_lines" name="num_credit_lines" min="0" max="20" value="3" required>
+            </div>
+            <div class="form-group">
+              <label for="dti_ratio">Debt-to-Income (DTI) Ratio</label>
+              <input type="number" id="dti_ratio" name="dti_ratio" min="0" max="2" step="0.01" value="0.30" required>
+            </div>
+          </div>
+
+          <!-- Section 5: Security Flags -->
+          <div class="form-row flags-row">
+            <div class="form-check">
+              <input type="checkbox" id="has_mortgage" name="has_mortgage">
+              <label for="has_mortgage">Has Existing Mortgage</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="has_dependents" name="has_dependents">
+              <label for="has_dependents">Has Dependents</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="has_cosigner" name="has_cosigner">
+              <label for="has_cosigner">Has Co-Signer</label>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" id="btn-submit" class="btn btn-primary btn-lg">
+              Run NIRNAY Risk Assessment
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Right Column: Results & Intelligence -->
+      <section class="card results-card" id="results-section">
+        <div class="card-header">
+          <h3>Assessment Intelligence</h3>
+          <span class="badge" id="model-badge">Enhanced Random Forest</span>
+        </div>
+
+        <!-- Initial Placeholder State -->
+        <div id="results-placeholder" class="results-placeholder">
+          <div class="placeholder-icon">📊</div>
+          <h4>No Assessment Run Yet</h4>
+          <p>Complete the application form on the left and click "Run NIRNAY Risk Assessment" to view the credit evaluation and alternative indicators.</p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="results-loading" class="results-loading hidden">
+          <div class="spinner"></div>
+          <h4>Evaluating Applicant Risk...</h4>
+          <p>Running feature engineering, normalization, and model inference.</p>
+        </div>
+
+        <!-- Populated Results Container -->
+        <div id="results-content" class="results-content hidden">
+          <!-- Primary Risk KPI -->
+          <div class="kpi-banner">
+            <div class="kpi-box">
+              <span class="kpi-label">Default Probability</span>
+              <span class="kpi-value" id="res-probability">--%</span>
+              <span class="kpi-subtext">Threshold: <strong id="res-threshold">0.47</strong></span>
+            </div>
+            <div class="kpi-box">
+              <span class="kpi-label">Risk Classification</span>
+              <span class="badge badge-lg" id="res-risk-class">--</span>
+              <span class="kpi-subtext">Binary Prediction: <strong id="res-prediction">-</strong></span>
+            </div>
+            <div class="kpi-box">
+              <span class="kpi-label">Recommended Action</span>
+              <span class="action-badge" id="res-action">--</span>
+              <span class="kpi-subtext">Decision Logic</span>
+            </div>
+          </div>
+
+          <!-- Alternative Credit Indicators Grid -->
+          <div class="section-heading">
+            <h4>Alternative Credit Indicators</h4>
+            <span class="tag">Proprietary TVS Engineering</span>
+          </div>
+
+          <div class="indicators-grid">
+            <div class="indicator-card">
+              <div class="ind-title">Financial Stability Score</div>
+              <div class="ind-value" id="ind-fss">--</div>
+              <div class="ind-desc">Multi-variable normalized stability</div>
+            </div>
+            <div class="indicator-card">
+              <div class="ind-title">Repayment Capacity</div>
+              <div class="ind-value" id="ind-rc">--</div>
+              <div class="ind-desc">Income buffer adjusted for DTI</div>
+            </div>
+            <div class="indicator-card">
+              <div class="ind-title">Employment Stability</div>
+              <div class="ind-value" id="ind-es">--</div>
+              <div class="ind-desc">Tenure stability index (0 - 1)</div>
+            </div>
+            <div class="indicator-card">
+              <div class="ind-title">Debt Stress</div>
+              <div class="ind-value" id="ind-ds">--</div>
+              <div class="ind-desc">DTI + Loan-to-Income burden</div>
+            </div>
+            <div class="indicator-card">
+              <div class="ind-title">Loan Burden</div>
+              <div class="ind-value" id="ind-lb">--</div>
+              <div class="ind-desc">Loan amount vs annual income</div>
+            </div>
+            <div class="indicator-card">
+              <div class="ind-title">Interest Burden</div>
+              <div class="ind-value" id="ind-ib">--</div>
+              <div class="ind-desc">Interest rate × loan burden</div>
+            </div>
+            <div class="indicator-card">
+              <div class="ind-title">Income-to-Loan Ratio</div>
+              <div class="ind-value" id="ind-ilr">--</div>
+              <div class="ind-desc">Income capacity multiple</div>
+            </div>
+            <div class="indicator-card">
+              <div class="ind-title">Credit Line Burden</div>
+              <div class="ind-value" id="ind-clb">--</div>
+              <div class="ind-desc">Credit line dependency proxy</div>
+            </div>
+          </div>
+
+          <!-- Model Explainability Factors -->
+          <div id="explanation-container" class="explanation-container">
+            <div class="section-heading">
+              <h4>Key Risk & Stability Drivers</h4>
+              <span class="tag">Model Explainability</span>
+            </div>
+            <div id="factors-list" class="factors-list">
+              <!-- Dynamically rendered -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>© TVS Credit Services Limited • NIRNAY Alternative Credit Intelligence System</p>
+      <div class="footer-links">
+        <a id="docs-link" href="http://localhost:8000/docs" target="_blank">FastAPI Swagger Docs</a>
+        <a id="health-link" href="http://localhost:8000/health" target="_blank">Health Status</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

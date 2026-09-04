@@ -1,0 +1,18 @@
+{
+  "CreditScore": {
+    "min": 300.0,
+    "max": 849.0
+  },
+  "MonthsEmployed": {
+    "min": 0.0,
+    "max": 119.0
+  },
+  "Income": {
+    "min": 15000.0,
+    "max": 149999.0
+  },
+  "DTIRatio": {
+    "min": 0.1,
+    "max": 0.9
+  }
+}

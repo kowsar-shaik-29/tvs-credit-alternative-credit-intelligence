@@ -1,0 +1,2 @@
+# This file preserves the backend/data directory structure.
+# The large training dataset (Loan_default.csv) is ignored to keep the repository lightweight for production deployment.
