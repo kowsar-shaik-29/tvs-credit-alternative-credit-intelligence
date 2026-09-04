@@ -464,7 +464,8 @@ async def list_audit_records():
 )
 async def run_full_nirnay_assessment(
     request: RiskAssessmentRequest,
-    customer_id: str = "TVS-CUST-10492"
+    customer_id: str = "TVS-CUST-10492",
+    archetype: Optional[str] = None
 ):
     """Execute complete end-to-end NIRNAY intelligence evaluation."""
     if not model_service.is_ready:
@@ -480,21 +481,21 @@ async def run_full_nirnay_assessment(
 
         # 2. Consents & Alternative Data Profile
         consents = _CUSTOMER_CONSENTS.get(customer_id, alternative_data_service.get_default_consents())
-        alt_profile = alternative_data_service.generate_alternative_profile(request, customer_id, consents)
+        alt_profile = alternative_data_service.generate_alternative_profile(request, customer_id, consents, archetype=archetype)
 
         # 3. Financial Digital Twin
         digital_twin = digital_twin_service.build_digital_twin(request, alt_profile)
 
-        # 4. Customer-Friendly Factors
+        # 4. Responsible Loan Recommendation (computed before explanations so recommended_tenure is known)
+        recommendation = recommendation_service.recommend_loan(request, alt_profile, default_prob)
+
+        # 5. Customer-Friendly Factors (distinguishing requested vs recommended tenure)
         friendly_factors = customer_explanation_service.build_friendly_factors(
-            request, alt_profile, raw_factors, default_prob
+            request, alt_profile, raw_factors, default_prob, recommended_tenure=recommendation.recommended_tenure_months
         )
 
-        # 5. Stress Simulation (7 scenarios)
+        # 6. Stress Simulation (7 scenarios)
         stress_results = stress_service.run_stress_test(request, alt_profile)
-
-        # 6. Responsible Loan Recommendation
-        recommendation = recommendation_service.recommend_loan(request, alt_profile, default_prob)
 
         # 7. Continuous Health Monitoring
         health_eval = monitoring_service.evaluate_health(customer_id, alt_profile, default_prob)
@@ -512,7 +513,7 @@ async def run_full_nirnay_assessment(
             consented_sources=consented_list,
             alt_stability_score=alt_profile.scores.cash_flow_stability,
             resilience_score=stress_results.baseline_resilience,
-            dealer_status=f"Eligible for ₹{recommendation.recommended_loan:,.0f}" if risk_details.prediction == 0 else "Verification Required"
+            dealer_status=f"Eligible for ₹{recommendation.recommended_loan:,.0f} ({recommendation.recommended_tenure_months}M)" if risk_details.prediction == 0 else "Verification Required"
         )
 
         return FullNirnayAssessmentResponse(
@@ -591,5 +592,6 @@ async def query_assistant(query: AssistantQueryRequest):
         alt_profile=alt_profile,
         default_prob=default_prob,
         recommended_loan=rec.recommended_loan,
-        resilience_score=resilience
+        resilience_score=resilience,
+        rec=rec
     )

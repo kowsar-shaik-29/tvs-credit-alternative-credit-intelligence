@@ -4,7 +4,7 @@ Translates internal machine-learning feature attributions and alternative signal
 into clear, accessible Positive, Risk, and Neutral factors for applicants and analysts.
 """
 
-from typing import List
+from typing import List, Optional
 from app.schemas.risk import RiskAssessmentRequest, RiskFactor
 from app.schemas.nirnay import (
     AlternativeDataProfile,
@@ -20,7 +20,8 @@ class CustomerExplanationService:
         request: RiskAssessmentRequest,
         alt_profile: AlternativeDataProfile,
         raw_factors: List[RiskFactor],
-        default_prob: float
+        default_prob: float,
+        recommended_tenure: Optional[int] = None
     ) -> List[CustomerFriendlyFactor]:
         friendly: List[CustomerFriendlyFactor] = []
         scores = alt_profile.scores
@@ -73,10 +74,10 @@ class CustomerExplanationService:
             friendly.append(
                 CustomerFriendlyFactor(
                     category="Positive",
-                    factor_name="Stable Employment Tenure",
+                    factor_name="Employment Tenure (Established)",
                     score_display=f"{request.months_employed} months",
                     impact="Positive",
-                    plain_explanation="Sustained employment with current employer demonstrates low risk of sudden income loss."
+                    plain_explanation=f"Sustained employment of {request.months_employed} months with current employer demonstrates low risk of sudden income loss."
                 )
             )
 
@@ -131,10 +132,20 @@ class CustomerExplanationService:
             friendly.append(
                 CustomerFriendlyFactor(
                     category="Risk",
-                    factor_name="Early Career / New Activity Tenure",
+                    factor_name="Employment Tenure (Early-Stage)",
                     score_display=f"{request.months_employed} months",
                     impact="Negative",
-                    plain_explanation="Limited duration in current occupation creates moderate sensitivity to economic shifts."
+                    plain_explanation=f"Current duration in occupation is {request.months_employed} months, creating moderate sensitivity to economic shifts."
+                )
+            )
+        elif 18 <= request.months_employed < 36:
+            friendly.append(
+                CustomerFriendlyFactor(
+                    category="Neutral",
+                    factor_name="Employment Tenure",
+                    score_display=f"{request.months_employed} months",
+                    impact="Neutral",
+                    plain_explanation=f"Applicant has {request.months_employed} months of verified employment tenure ({request.employment_type})."
                 )
             )
 
@@ -149,24 +160,35 @@ class CustomerExplanationService:
                 )
             )
 
-        # Neutral Factors
+        # Neutral Factors - Explicitly Distinguishing Requested vs Recommended
         friendly.append(
             CustomerFriendlyFactor(
                 category="Neutral",
-                factor_name="Loan Term Duration",
+                factor_name="Requested Loan Term",
                 score_display=f"{request.loan_term} months",
                 impact="Neutral",
-                plain_explanation=f"Structured over {request.loan_term} months; balancing manageable monthly payments with overall interest."
+                plain_explanation=f"Applicant requested a repayment duration of {request.loan_term} months."
             )
         )
+
+        if recommended_tenure is not None and recommended_tenure != request.loan_term:
+            friendly.append(
+                CustomerFriendlyFactor(
+                    category="Neutral",
+                    factor_name="Recommended Structured Tenure",
+                    score_display=f"{recommended_tenure} months",
+                    impact="Neutral",
+                    plain_explanation=f"Underwriting structure recommends {recommended_tenure} months tenure to ensure debt service remains comfortable."
+                )
+            )
 
         friendly.append(
             CustomerFriendlyFactor(
                 category="Neutral",
-                factor_name="Loan Purpose",
+                factor_name="Requested Loan Purpose",
                 score_display=f"{request.loan_purpose}",
                 impact="Neutral",
-                plain_explanation=f"Loan earmarked for {request.loan_purpose} financing with appropriate category underwriting guidelines."
+                plain_explanation=f"Loan earmarked for {request.loan_purpose} financing with category-specific underwriting criteria."
             )
         )
 

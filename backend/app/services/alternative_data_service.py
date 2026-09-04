@@ -137,11 +137,14 @@ class AlternativeDataService:
         self,
         request: RiskAssessmentRequest,
         customer_id: str = "TVS-CUST-10492",
-        consents: Optional[List[ConsentItem]] = None
+        consents: Optional[List[ConsentItem]] = None,
+        archetype: Optional[str] = None
     ) -> AlternativeDataProfile:
         """Generate comprehensive simulated alternative data matching the applicant's profile."""
-        archetype = self.identify_archetype(request)
+        if not archetype or archetype == "custom":
+            archetype = self.identify_archetype(request)
         monthly_income = max(request.income / 12.0, 1000.0)
+        observed_months = max(min(request.months_employed, 36), 6)
 
         # Consent mapping
         consent_dict = {}
@@ -161,13 +164,13 @@ class AlternativeDataService:
                 minimum_monthly_balance=round(monthly_income * 0.28, 2),
                 recurring_expenses=round(monthly_income * 0.40, 2),
                 inflow_outflow_ratio=1.41,
-                months_of_observed_history=18
+                months_of_observed_history=observed_months
             ) if consent_dict.get("bank_cash_flow", True) else None
 
             upi = UPIDigitalData(
                 transaction_count_monthly=48,
                 average_transaction_amount=380.0,
-                monthly_transaction_volume=18240.0,
+                monthly_transaction_volume=round(monthly_income * 0.45, 2),
                 payment_consistency=94.0,
                 failed_transaction_rate=1.2,
                 recurring_payment_consistency=92.0,
@@ -175,22 +178,22 @@ class AlternativeDataService:
             ) if consent_dict.get("upi_digital", True) else None
 
             utility = UtilityHistoryData(
-                bills_paid=24,
-                bills_on_time=23,
+                bills_paid=observed_months,
+                bills_on_time=max(observed_months - 1, 1),
                 missed_payments=0,
                 average_bill_amount=1450.0,
                 payment_consistency=96.0,
                 utility_payment_discipline=95.0,
-                months_of_history=24
+                months_of_history=observed_months
             ) if consent_dict.get("utility_payments", True) else None
 
             telecom = TelecomHistoryData(
                 average_monthly_bill=499.0,
-                bills_paid_on_time=18,
+                bills_paid_on_time=observed_months,
                 missed_payments=0,
                 average_payment_delay_days=0.5,
                 payment_consistency=98.0,
-                months_of_history=18
+                months_of_history=observed_months
             ) if consent_dict.get("mobile_bill", True) else None
 
             gst = GSTBusinessData(is_applicable=False)
@@ -206,9 +209,9 @@ class AlternativeDataService:
                 cash_flow_stability=86,
                 utility_discipline=95,
                 digital_payment_discipline=93,
-                employment_stability=max(int(min(request.months_employed / 36.0, 1.0) * 80 + 15), 45),
+                employment_stability=max(int(min(request.months_employed / 36.0, 1.0) * 80 + 15), 35),
                 business_stability=None,
-                debt_burden=max(int(request.dti_ratio * 100), 20),
+                debt_burden=min(max(int(request.dti_ratio * 100), 10), 95),
                 financial_resilience=85
             )
 
@@ -222,13 +225,13 @@ class AlternativeDataService:
                 minimum_monthly_balance=round(monthly_income * 0.35, 2),
                 recurring_expenses=round(monthly_income * 0.55, 2),
                 inflow_outflow_ratio=1.42,
-                months_of_observed_history=36
+                months_of_observed_history=observed_months
             ) if consent_dict.get("bank_cash_flow", True) else None
 
             upi = UPIDigitalData(
                 transaction_count_monthly=142,
                 average_transaction_amount=620.0,
-                monthly_transaction_volume=88040.0,
+                monthly_transaction_volume=round(monthly_income * 1.15, 2),
                 payment_consistency=91.0,
                 failed_transaction_rate=0.8,
                 recurring_payment_consistency=88.0,
@@ -236,28 +239,28 @@ class AlternativeDataService:
             ) if consent_dict.get("upi_digital", True) else None
 
             utility = UtilityHistoryData(
-                bills_paid=36,
-                bills_on_time=34,
+                bills_paid=observed_months,
+                bills_on_time=max(observed_months - 2, 1),
                 missed_payments=0,
                 average_bill_amount=3850.0,
                 payment_consistency=93.0,
                 utility_payment_discipline=92.0,
-                months_of_history=36
+                months_of_history=observed_months
             ) if consent_dict.get("utility_payments", True) else None
 
             telecom = TelecomHistoryData(
                 average_monthly_bill=899.0,
-                bills_paid_on_time=32,
+                bills_paid_on_time=max(observed_months - 3, 1),
                 missed_payments=0,
                 average_payment_delay_days=1.2,
                 payment_consistency=92.0,
-                months_of_history=36
+                months_of_history=observed_months
             ) if consent_dict.get("mobile_bill", True) else None
 
             gst = GSTBusinessData(
                 is_applicable=True,
-                business_name="Lakshmi Enterprises / Retail Grocery",
-                business_tenure_years=4.5,
+                business_name="Commercial Merchant Trade Facility",
+                business_tenure_years=round(request.months_employed / 12.0, 1),
                 monthly_revenue_trend="Consistent / Seasonal Uplift",
                 gst_filing_consistency=95.0,
                 revenue_stability=88.0,
@@ -265,14 +268,19 @@ class AlternativeDataService:
                 seasonal_volatility="Moderate (Festival peaks)"
             ) if consent_dict.get("gst_business", True) else None
 
+            rel_note = (
+                "Completed TVS Two-Wheeler loan with 100% on-time record."
+                if request.loan_purpose == "Auto"
+                else f"Completed prior TVS {request.loan_purpose} credit facility with 100% on-time record."
+            )
             tvs = TVSRepaymentData(
                 has_history=True,
                 previous_loans_count=1,
                 repayment_consistency=96.0,
-                on_time_payments=24,
+                on_time_payments=max(observed_months - 2, 1),
                 missed_payments=0,
                 completed_loans=1,
-                relationship_notes="Completed TVS Commercial Two-Wheeler loan with 100% on-time record."
+                relationship_notes=rel_note
             ) if consent_dict.get("tvs_repayment", True) else None
 
             scores = AlternativeScores(
@@ -281,9 +289,9 @@ class AlternativeDataService:
                 cash_flow_stability=83,
                 utility_discipline=92,
                 digital_payment_discipline=90,
-                employment_stability=86,
+                employment_stability=max(int(min(request.months_employed / 48.0, 1.0) * 75 + 15), 35),
                 business_stability=88,
-                debt_burden=max(int(request.dti_ratio * 100), 25),
+                debt_burden=min(max(int(request.dti_ratio * 100), 10), 95),
                 financial_resilience=84
             )
 
@@ -297,13 +305,13 @@ class AlternativeDataService:
                 minimum_monthly_balance=round(monthly_income * 0.18, 2),
                 recurring_expenses=round(monthly_income * 0.45, 2),
                 inflow_outflow_ratio=1.28,
-                months_of_observed_history=14
+                months_of_observed_history=observed_months
             ) if consent_dict.get("bank_cash_flow", True) else None
 
             upi = UPIDigitalData(
                 transaction_count_monthly=95,
                 average_transaction_amount=240.0,
-                monthly_transaction_volume=22800.0,
+                monthly_transaction_volume=round(monthly_income * 0.65, 2),
                 payment_consistency=89.0,
                 failed_transaction_rate=1.8,
                 recurring_payment_consistency=86.0,
@@ -311,29 +319,29 @@ class AlternativeDataService:
             ) if consent_dict.get("upi_digital", True) else None
 
             utility = UtilityHistoryData(
-                bills_paid=14,
-                bills_on_time=13,
+                bills_paid=observed_months,
+                bills_on_time=max(observed_months - 1, 1),
                 missed_payments=0,
                 average_bill_amount=1150.0,
                 payment_consistency=90.0,
                 utility_payment_discipline=89.0,
-                months_of_history=14
+                months_of_history=observed_months
             ) if consent_dict.get("utility_payments", True) else None
 
             telecom = TelecomHistoryData(
                 average_monthly_bill=399.0,
-                bills_paid_on_time=14,
+                bills_paid_on_time=observed_months,
                 missed_payments=0,
                 average_payment_delay_days=0.8,
                 payment_consistency=94.0,
-                months_of_history=14
+                months_of_history=observed_months
             ) if consent_dict.get("mobile_bill", True) else None
 
             gst = GSTBusinessData(is_applicable=False)
 
             tvs = TVSRepaymentData(
                 has_history=False,
-                relationship_notes="New platform delivery partner applicant."
+                relationship_notes=f"New platform partner applicant ({request.employment_type}) applying for {request.loan_purpose} financing."
             )
 
             scores = AlternativeScores(
@@ -342,14 +350,14 @@ class AlternativeDataService:
                 cash_flow_stability=77,
                 utility_discipline=89,
                 digital_payment_discipline=88,
-                employment_stability=max(int(min(request.months_employed / 24.0, 1.0) * 70 + 15), 40),
+                employment_stability=max(int(min(request.months_employed / 24.0, 1.0) * 70 + 15), 30),
                 business_stability=None,
-                debt_burden=max(int(request.dti_ratio * 100), 28),
+                debt_burden=min(max(int(request.dti_ratio * 100), 10), 95),
                 financial_resilience=76
             )
 
         elif archetype == "rural_customer":
-            # Semi-urban or agri allied: seasonal cash spikes, prompt TVS rural two-wheeler repayment
+            # Semi-urban or agri allied: seasonal cash spikes, prompt TVS rural repayment
             bank = BankCashFlowData(
                 average_monthly_inflow=round(monthly_income * 1.10, 2),
                 average_monthly_outflow=round(monthly_income * 0.70, 2),
@@ -358,13 +366,13 @@ class AlternativeDataService:
                 minimum_monthly_balance=round(monthly_income * 0.30, 2),
                 recurring_expenses=round(monthly_income * 0.35, 2),
                 inflow_outflow_ratio=1.57,
-                months_of_observed_history=24
+                months_of_observed_history=observed_months
             ) if consent_dict.get("bank_cash_flow", True) else None
 
             upi = UPIDigitalData(
                 transaction_count_monthly=32,
                 average_transaction_amount=450.0,
-                monthly_transaction_volume=14400.0,
+                monthly_transaction_volume=round(monthly_income * 0.45, 2),
                 payment_consistency=88.0,
                 failed_transaction_rate=1.5,
                 recurring_payment_consistency=87.0,
@@ -372,34 +380,39 @@ class AlternativeDataService:
             ) if consent_dict.get("upi_digital", True) else None
 
             utility = UtilityHistoryData(
-                bills_paid=24,
-                bills_on_time=23,
+                bills_paid=observed_months,
+                bills_on_time=max(observed_months - 1, 1),
                 missed_payments=0,
                 average_bill_amount=880.0,
                 payment_consistency=94.0,
                 utility_payment_discipline=93.0,
-                months_of_history=24
+                months_of_history=observed_months
             ) if consent_dict.get("utility_payments", True) else None
 
             telecom = TelecomHistoryData(
                 average_monthly_bill=349.0,
-                bills_paid_on_time=24,
+                bills_paid_on_time=observed_months,
                 missed_payments=0,
                 average_payment_delay_days=1.1,
                 payment_consistency=93.0,
-                months_of_history=24
+                months_of_history=observed_months
             ) if consent_dict.get("mobile_bill", True) else None
 
             gst = GSTBusinessData(is_applicable=False)
 
+            rel_note = (
+                "Prior TVS Two-Wheeler loan serviced with spotless rural repayment track record."
+                if request.loan_purpose == "Auto"
+                else f"Prior TVS {request.loan_purpose} credit facility serviced with spotless rural repayment track record."
+            )
             tvs = TVSRepaymentData(
                 has_history=True,
                 previous_loans_count=1,
                 repayment_consistency=95.0,
-                on_time_payments=18,
+                on_time_payments=max(observed_months - 2, 1),
                 missed_payments=0,
                 completed_loans=1,
-                relationship_notes="Prior TVS Two-Wheeler loan serviced with spotless rural repayment track record."
+                relationship_notes=rel_note
             ) if consent_dict.get("tvs_repayment", True) else None
 
             scores = AlternativeScores(
@@ -408,9 +421,9 @@ class AlternativeDataService:
                 cash_flow_stability=80,
                 utility_discipline=93,
                 digital_payment_discipline=86,
-                employment_stability=78,
+                employment_stability=max(int(min(request.months_employed / 48.0, 1.0) * 70 + 15), 35),
                 business_stability=None,
-                debt_burden=max(int(request.dti_ratio * 100), 22),
+                debt_burden=min(max(int(request.dti_ratio * 100), 10), 95),
                 financial_resilience=82
             )
 
@@ -424,36 +437,38 @@ class AlternativeDataService:
                 minimum_monthly_balance=round(monthly_income * 0.04, 2),
                 recurring_expenses=round(monthly_income * 0.72, 2),
                 inflow_outflow_ratio=0.97,
-                months_of_observed_history=12
+                months_of_observed_history=observed_months
             ) if consent_dict.get("bank_cash_flow", True) else None
 
             upi = UPIDigitalData(
                 transaction_count_monthly=22,
                 average_transaction_amount=310.0,
-                monthly_transaction_volume=6820.0,
+                monthly_transaction_volume=round(monthly_income * 0.25, 2),
                 payment_consistency=54.0,
                 failed_transaction_rate=9.8,
                 recurring_payment_consistency=48.0,
                 digital_payment_discipline=50.0
             ) if consent_dict.get("upi_digital", True) else None
 
+            on_time_util = max(int(observed_months * 0.6), 1)
             utility = UtilityHistoryData(
-                bills_paid=12,
-                bills_on_time=7,
-                missed_payments=3,
+                bills_paid=observed_months,
+                bills_on_time=on_time_util,
+                missed_payments=observed_months - on_time_util,
                 average_bill_amount=1650.0,
                 payment_consistency=58.0,
                 utility_payment_discipline=52.0,
-                months_of_history=12
+                months_of_history=observed_months
             ) if consent_dict.get("utility_payments", True) else None
 
+            on_time_tel = max(int(observed_months * 0.5), 1)
             telecom = TelecomHistoryData(
                 average_monthly_bill=599.0,
-                bills_paid_on_time=6,
-                missed_payments=4,
+                bills_paid_on_time=on_time_tel,
+                missed_payments=observed_months - on_time_tel,
                 average_payment_delay_days=8.4,
                 payment_consistency=52.0,
-                months_of_history=12
+                months_of_history=observed_months
             ) if consent_dict.get("mobile_bill", True) else None
 
             gst = GSTBusinessData(is_applicable=False)
@@ -462,11 +477,11 @@ class AlternativeDataService:
                 has_history=True,
                 previous_loans_count=1,
                 repayment_consistency=58.0,
-                on_time_payments=8,
+                on_time_payments=max(int(observed_months * 0.6), 1),
                 missed_payments=3,
                 overdue_history=True,
                 completed_loans=0,
-                relationship_notes="Existing loan with 3 delayed EMI payments in last 12 months."
+                relationship_notes="Existing loan with delayed EMI payments observed in history."
             ) if consent_dict.get("tvs_repayment", True) else None
 
             scores = AlternativeScores(
@@ -475,9 +490,9 @@ class AlternativeDataService:
                 cash_flow_stability=44,
                 utility_discipline=52,
                 digital_payment_discipline=50,
-                employment_stability=min(int(request.months_employed / 36.0 * 50 + 20), 65),
+                employment_stability=max(min(int(request.months_employed / 36.0 * 50 + 20), 65), 25),
                 business_stability=None,
-                debt_burden=min(int(request.dti_ratio * 100), 95),
+                debt_burden=min(max(int(request.dti_ratio * 100), 10), 95),
                 financial_resilience=42
             )
 
@@ -491,13 +506,13 @@ class AlternativeDataService:
                 minimum_monthly_balance=round(monthly_income * 0.85, 2),
                 recurring_expenses=round(monthly_income * 0.30, 2),
                 inflow_outflow_ratio=2.09,
-                months_of_observed_history=36
+                months_of_observed_history=observed_months
             ) if consent_dict.get("bank_cash_flow", True) else None
 
             upi = UPIDigitalData(
                 transaction_count_monthly=62,
                 average_transaction_amount=950.0,
-                monthly_transaction_volume=58900.0,
+                monthly_transaction_volume=round(monthly_income * 0.45, 2),
                 payment_consistency=97.0,
                 failed_transaction_rate=0.4,
                 recurring_payment_consistency=98.0,
@@ -505,34 +520,39 @@ class AlternativeDataService:
             ) if consent_dict.get("upi_digital", True) else None
 
             utility = UtilityHistoryData(
-                bills_paid=36,
-                bills_on_time=36,
+                bills_paid=observed_months,
+                bills_on_time=observed_months,
                 missed_payments=0,
                 average_bill_amount=2850.0,
                 payment_consistency=100.0,
                 utility_payment_discipline=98.0,
-                months_of_history=36
+                months_of_history=observed_months
             ) if consent_dict.get("utility_payments", True) else None
 
             telecom = TelecomHistoryData(
                 average_monthly_bill=999.0,
-                bills_paid_on_time=36,
+                bills_paid_on_time=observed_months,
                 missed_payments=0,
                 average_payment_delay_days=0.0,
                 payment_consistency=100.0,
-                months_of_history=36
+                months_of_history=observed_months
             ) if consent_dict.get("mobile_bill", True) else None
 
             gst = GSTBusinessData(is_applicable=False)
 
+            rel_note = (
+                "Two prior TVS loans completed with flawless zero-bounce records."
+                if request.loan_purpose == "Auto"
+                else f"Prior TVS {request.loan_purpose} credit facility completed with flawless zero-bounce records."
+            )
             tvs = TVSRepaymentData(
                 has_history=True,
                 previous_loans_count=2,
                 repayment_consistency=99.0,
-                on_time_payments=48,
+                on_time_payments=observed_months,
                 missed_payments=0,
                 completed_loans=2,
-                relationship_notes="Two prior TVS loans completed with flawless zero-bounce records."
+                relationship_notes=rel_note
             ) if consent_dict.get("tvs_repayment", True) else None
 
             scores = AlternativeScores(
@@ -541,9 +561,9 @@ class AlternativeDataService:
                 cash_flow_stability=94,
                 utility_discipline=98,
                 digital_payment_discipline=97,
-                employment_stability=92,
+                employment_stability=max(int(min(request.months_employed / 48.0, 1.0) * 75 + 20), 40),
                 business_stability=None,
-                debt_burden=max(int(request.dti_ratio * 100), 15),
+                debt_burden=min(max(int(request.dti_ratio * 100), 10), 95),
                 financial_resilience=95
             )
 
@@ -557,13 +577,13 @@ class AlternativeDataService:
                 minimum_monthly_balance=round(monthly_income * 0.25, 2),
                 recurring_expenses=round(monthly_income * 0.42, 2),
                 inflow_outflow_ratio=1.42,
-                months_of_observed_history=24
+                months_of_observed_history=observed_months
             ) if consent_dict.get("bank_cash_flow", True) else None
 
             upi = UPIDigitalData(
                 transaction_count_monthly=38,
                 average_transaction_amount=420.0,
-                monthly_transaction_volume=15960.0,
+                monthly_transaction_volume=round(monthly_income * 0.35, 2),
                 payment_consistency=92.0,
                 failed_transaction_rate=1.4,
                 recurring_payment_consistency=90.0,
@@ -571,29 +591,29 @@ class AlternativeDataService:
             ) if consent_dict.get("upi_digital", True) else None
 
             utility = UtilityHistoryData(
-                bills_paid=24,
-                bills_on_time=23,
+                bills_paid=observed_months,
+                bills_on_time=max(observed_months - 1, 1),
                 missed_payments=0,
                 average_bill_amount=1650.0,
                 payment_consistency=95.0,
                 utility_payment_discipline=94.0,
-                months_of_history=24
+                months_of_history=observed_months
             ) if consent_dict.get("utility_payments", True) else None
 
             telecom = TelecomHistoryData(
                 average_monthly_bill=549.0,
-                bills_paid_on_time=23,
+                bills_paid_on_time=max(observed_months - 1, 1),
                 missed_payments=0,
                 average_payment_delay_days=0.7,
                 payment_consistency=96.0,
-                months_of_history=24
+                months_of_history=observed_months
             ) if consent_dict.get("mobile_bill", True) else None
 
             gst = GSTBusinessData(is_applicable=False)
 
             tvs = TVSRepaymentData(
                 has_history=False,
-                relationship_notes="No previous TVS repayment history"
+                relationship_notes=f"No prior TVS credit history for {request.loan_purpose} financing."
             )
 
             scores = AlternativeScores(
@@ -602,9 +622,9 @@ class AlternativeDataService:
                 cash_flow_stability=87,
                 utility_discipline=95,
                 digital_payment_discipline=89,
-                employment_stability=int(min(request.months_employed / 48.0, 1.0) * 75 + 15),
+                employment_stability=max(int(min(request.months_employed / 48.0, 1.0) * 75 + 15), 35),
                 business_stability=None,
-                debt_burden=int(request.dti_ratio * 100),
+                debt_burden=min(max(int(request.dti_ratio * 100), 10), 95),
                 financial_resilience=86
             )
 
@@ -619,9 +639,34 @@ class AlternativeDataService:
             "thin_file_stable": "Ananya Roy (Thin-File Salaried)"
         }
 
+        # Check if request matches a known preset customer's inputs
+        known_presets = {
+            "notebook_demo": (30, 50000.0, 36, 40000.0, 36, 650, 0.30),
+            "first_time_borrower": (23, 42000.0, 14, 25000.0, 24, 610, 0.20),
+            "strong_alternative": (45, 135000.0, 72, 60000.0, 36, 780, 0.18),
+            "thin_file_stable": (34, 38000.0, 40, 20000.0, 24, 630, 0.22),
+            "gig_worker": (27, 35000.0, 16, 18000.0, 18, 590, 0.28),
+            "small_merchant": (41, 75000.0, 54, 80000.0, 36, 660, 0.32),
+            "rural_customer": (38, 32000.0, 48, 28000.0, 30, 620, 0.24),
+            "high_risk": (29, 28000.0, 12, 65000.0, 36, 420, 0.78)
+        }
+        matched_preset = None
+        for p_key, (p_age, p_inc, p_mo, p_loan, p_term, p_cs, p_dti) in known_presets.items():
+            if (request.age == p_age and abs(request.income - p_inc) < 1.0 and
+                request.months_employed == p_mo and abs(request.loan_amount - p_loan) < 1.0 and
+                request.loan_term == p_term and request.credit_score == p_cs and
+                abs(request.dti_ratio - p_dti) < 0.01):
+                matched_preset = p_key
+                break
+
+        if matched_preset and matched_preset in name_map:
+            customer_name = name_map[matched_preset]
+        else:
+            customer_name = f"Applicant ({request.employment_type} • {request.loan_purpose} Loan)"
+
         return AlternativeDataProfile(
             customer_id=customer_id,
-            customer_name=name_map.get(archetype, "Customer Applicant"),
+            customer_name=customer_name,
             archetype_name=archetype.replace("_", " ").title(),
             bank_cash_flow=bank,
             upi_digital=upi,

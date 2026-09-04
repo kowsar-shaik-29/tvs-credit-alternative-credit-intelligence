@@ -128,9 +128,13 @@ class RiskApiClient {
     }
   }
 
-  async runFullNirnayAssessment(applicationData, customerId = "TVS-CUST-10492") {
+  async runFullNirnayAssessment(applicationData, customerId = "TVS-CUST-10492", archetype = null) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/v1/nirnay/full-assessment?customer_id=${encodeURIComponent(customerId)}`, {
+      let url = `${this.baseUrl}/api/v1/nirnay/full-assessment?customer_id=${encodeURIComponent(customerId)}`;
+      if (archetype && archetype !== "custom") {
+        url += `&archetype=${encodeURIComponent(archetype)}`;
+      }
+      const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify(applicationData)

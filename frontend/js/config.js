@@ -47,9 +47,8 @@
       return "http://localhost:8000";
     }
 
-    // 5. Production default: set placeholder or relative root
-    // To configure for production, set window.API_BASE_URL or TVS_API_BASE_URL
-    return "";
+    // 5. Production default: Render hosted backend API
+    return "https://tvs-nirnay-api.onrender.com";
   }
 
   window.APP_CONFIG = {

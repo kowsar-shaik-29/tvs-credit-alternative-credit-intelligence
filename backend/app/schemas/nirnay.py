@@ -185,8 +185,10 @@ class StressSimulationResponse(BaseModel):
 
 class LoanRecommendationResponse(BaseModel):
     requested_amount: float
+    requested_loan_amount: Optional[float] = None
     recommended_loan: float
     max_comfortable_loan: float
+    requested_tenure_months: Optional[int] = None
     recommended_tenure_months: int
     estimated_emi: float
     interest_rate: float

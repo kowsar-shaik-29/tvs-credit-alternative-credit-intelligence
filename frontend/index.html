@@ -23,6 +23,7 @@
         <div class="persona-picker-container">
           <label for="persona-select" class="picker-label">Applicant Archetype:</label>
           <select id="persona-select" class="persona-select">
+            <option value="custom">Custom Applicant (User Defined Form)</option>
             <option value="notebook_demo" selected>Arun Kumar (Notebook Reference)</option>
             <option value="first_time_borrower">1. First-Time Borrower (Thin File, High Digital)</option>
             <option value="strong_alternative">2. Strong Alternative Profile (High Buffer)</option>
@@ -286,16 +287,24 @@
 
                 <div class="rec-grid">
                   <div class="rec-item">
+                    <span class="rec-label">Requested Loan Amount</span>
+                    <span class="rec-val" id="rec-req-loan">₹--</span>
+                  </div>
+                  <div class="rec-item">
                     <span class="rec-label">Recommended Loan</span>
                     <span class="rec-val highlight" id="rec-loan">₹--</span>
                   </div>
                   <div class="rec-item">
-                    <span class="rec-label">Max Comfortable Loan</span>
-                    <span class="rec-val" id="rec-max-loan">₹--</span>
+                    <span class="rec-label">Requested Term</span>
+                    <span class="rec-val" id="rec-req-tenure">-- months</span>
                   </div>
                   <div class="rec-item">
                     <span class="rec-label">Recommended Tenure</span>
-                    <span class="rec-val" id="rec-tenure">-- months</span>
+                    <span class="rec-val highlight" id="rec-tenure">-- months</span>
+                  </div>
+                  <div class="rec-item">
+                    <span class="rec-label">Max Comfortable Loan</span>
+                    <span class="rec-val" id="rec-max-loan">₹--</span>
                   </div>
                   <div class="rec-item">
                     <span class="rec-label">Estimated Monthly EMI</span>
@@ -655,12 +664,12 @@
             <div class="dealer-metric-box">
               <span class="label">Approved Financing Amount</span>
               <span class="val" id="dealer-amount">₹40,000</span>
-              <span class="subtext">Ready for Vehicle Booking</span>
+              <span class="subtext" id="dealer-req-amount-subtext">Requested: ₹40,000</span>
             </div>
             <div class="dealer-metric-box">
               <span class="label">Approved Tenure</span>
               <span class="val" id="dealer-tenure">36 Months</span>
-              <span class="subtext">Standard TVS EMI Schedule</span>
+              <span class="subtext" id="dealer-req-tenure-subtext">Requested: 36 Months</span>
             </div>
             <div class="dealer-metric-box">
               <span class="label">Estimated Customer EMI</span>
@@ -688,8 +697,8 @@
     <div class="container footer-content">
       <p>© TVS Credit Services Limited • NIRNAY Alternative Credit Intelligence System</p>
       <div class="footer-links">
-        <a id="docs-link" href="http://localhost:8000/docs" target="_blank">FastAPI Swagger Docs</a>
-        <a id="health-link" href="http://localhost:8000/health" target="_blank">Health Status</a>
+        <a id="docs-link" href="https://tvs-nirnay-api.onrender.com/docs" target="_blank">FastAPI Swagger Docs</a>
+        <a id="health-link" href="https://tvs-nirnay-api.onrender.com/health" target="_blank">Health Status</a>
       </div>
     </div>
   </footer>

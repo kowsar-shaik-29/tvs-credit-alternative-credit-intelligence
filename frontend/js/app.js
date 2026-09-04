@@ -31,7 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Recommendation Elements
   const recAffordability = document.getElementById("rec-affordability");
+  const recReqLoan = document.getElementById("rec-req-loan");
   const recLoan = document.getElementById("rec-loan");
+  const recReqTenure = document.getElementById("rec-req-tenure");
   const recMaxLoan = document.getElementById("rec-max-loan");
   const recTenure = document.getElementById("rec-tenure");
   const recEmi = document.getElementById("rec-emi");
@@ -266,15 +268,34 @@ document.addEventListener("DOMContentLoaded", () => {
     showAlert(`Loaded Archetype: ${p.name}. Click "Run NIRNAY Full Assessment" to evaluate.`, "info");
   }
 
-  personaSelect.addEventListener("change", (e) => {
-    applyPreset(e.target.value);
-  });
+  if (personaSelect) {
+    personaSelect.addEventListener("change", (e) => {
+      if (e.target.value === "custom") {
+        showAlert("Custom applicant mode selected. Form fields are user-defined.", "info");
+        return;
+      }
+      applyPreset(e.target.value);
+    });
+  }
+
+  // Switch persona select to 'custom' whenever user modifies form fields directly
+  if (form) {
+    const markAsCustom = () => {
+      if (personaSelect && personaSelect.value !== "custom") {
+        personaSelect.value = "custom";
+      }
+    };
+    form.addEventListener("input", markAsCustom);
+    form.addEventListener("change", markAsCustom);
+  }
 
   // Autofill Button (Notebook reference customer)
-  btnAutofill.addEventListener("click", () => {
-    personaSelect.value = "notebook_demo";
-    applyPreset("notebook_demo");
-  });
+  if (btnAutofill) {
+    btnAutofill.addEventListener("click", () => {
+      if (personaSelect) personaSelect.value = "notebook_demo";
+      applyPreset("notebook_demo");
+    });
+  }
 
   // =========================================================================
   // 3. CONSENT & ALTERNATIVE DATA ACCESS MANAGER
@@ -386,7 +407,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       // 3. Call full NIRNAY composite API
-      const result = await window.riskApi.runFullNirnayAssessment(applicationData);
+      const currentArchetype = (personaSelect && personaSelect.value !== "custom") ? personaSelect.value : null;
+      const result = await window.riskApi.runFullNirnayAssessment(applicationData, "TVS-CUST-10492", currentArchetype);
       currentAssessmentResult = result;
 
       // 4. Render Results
@@ -438,6 +460,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 2. Responsible Loan Recommendation Box
+    const reqLoan = rec.requested_loan_amount ?? inputData.loan_amount;
+    const reqTenure = rec.requested_tenure_months ?? inputData.loan_term;
+    if (recReqLoan) recReqLoan.textContent = `₹${reqLoan.toLocaleString('en-IN')}`;
+    if (recReqTenure) recReqTenure.textContent = `${reqTenure} Months`;
+
     recAffordability.textContent = rec.affordability_status;
     recAffordability.className = `badge ${rec.affordability_status === 'Comfortable' ? 'badge-success' : (rec.affordability_status === 'Manageable' ? 'badge-warning' : 'badge-danger')}`;
     recLoan.textContent = `₹${rec.recommended_loan.toLocaleString('en-IN')}`;
@@ -477,6 +504,39 @@ document.addEventListener("DOMContentLoaded", () => {
     dealerEmi.textContent = `₹${rec.estimated_emi.toLocaleString('en-IN')} / month`;
     dealerStatusBadge.textContent = risk.prediction === 0 ? "Eligible" : "Further Review";
     dealerStatusBadge.className = `badge ${risk.prediction === 0 ? 'badge-success' : 'badge-warning'}`;
+
+    const dealerReqAmtSub = document.getElementById("dealer-req-amount-subtext");
+    const dealerReqTenSub = document.getElementById("dealer-req-tenure-subtext");
+    if (dealerReqAmtSub) dealerReqAmtSub.textContent = `Requested: ₹${reqLoan.toLocaleString('en-IN')}`;
+    if (dealerReqTenSub) dealerReqTenSub.textContent = `Requested: ${reqTenure} Months`;
+
+    // 11. Sync with Analyst Audit Table
+    if (data.application_id) {
+      const auditRec = {
+        application_id: data.application_id,
+        customer_name: data.customer_name,
+        timestamp: "Just Now",
+        default_probability: risk.default_probability,
+        risk_classification: risk.risk_classification,
+        recommended_action: risk.recommended_action,
+        alternative_stability_score: scores.employment_stability,
+        resilience_score: stress.baseline_resilience,
+        model_name: "Enhanced Random Forest",
+        model_version: "2.0.0",
+        threshold: risk.risk_threshold,
+        consented_sources: ["bank_cash_flow", "upi_digital", "utility_payments"],
+        analyst_action: risk.recommended_action === "ELIGIBLE" ? "AUTO APPROVED" : "FLAGGED FOR REVIEW",
+        dealer_status: risk.prediction === 0 ? "READY FOR DISBURSAL" : "PENDING AUDIT"
+      };
+      const existingIdx = currentAuditRecords.findIndex(r => r.application_id === auditRec.application_id);
+      if (existingIdx >= 0) {
+        currentAuditRecords[existingIdx] = auditRec;
+      } else {
+        currentAuditRecords.unshift(auditRec);
+      }
+      updateAnalystCounters(currentAuditRecords);
+      renderAnalystTable(currentAuditRecords);
+    }
   }
 
   function renderAlternativeScores(scores) {
@@ -817,6 +877,17 @@ document.addEventListener("DOMContentLoaded", () => {
     dealerEmi.textContent = `₹${rec.estimated_emi.toLocaleString('en-IN')} / month`;
     dealerStatusBadge.textContent = risk.prediction === 0 ? "Eligible" : "Further Review";
     dealerStatusBadge.className = `badge ${risk.prediction === 0 ? 'badge-success' : 'badge-warning'}`;
+
+    const reqAmtSub = document.getElementById("dealer-req-amount-subtext");
+    const reqTenSub = document.getElementById("dealer-req-tenure-subtext");
+    const reqLoan = rec.requested_loan_amount ?? currentAssessmentResult.risk_assessment?.requested_loan_amount;
+    const reqTenure = rec.requested_tenure_months;
+    if (reqAmtSub && reqLoan) {
+      reqAmtSub.textContent = `Requested: ₹${reqLoan.toLocaleString('en-IN')}`;
+    }
+    if (reqTenSub && reqTenure) {
+      reqTenSub.textContent = `Requested: ${reqTenure} Months`;
+    }
   }
 
   // =========================================================================
