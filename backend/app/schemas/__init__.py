@@ -8,6 +8,31 @@ from .risk import (
     ErrorDetail,
     ErrorResponse
 )
+from .nirnay import (
+    ConsentItem,
+    ConsentUpdateRequest,
+    ConsentStatusResponse,
+    BankCashFlowData,
+    UPIDigitalData,
+    UtilityHistoryData,
+    TelecomHistoryData,
+    GSTBusinessData,
+    TVSRepaymentData,
+    AlternativeScores,
+    AlternativeDataProfile,
+    DigitalTwinDimension,
+    DigitalTwinResponse,
+    StressScenarioResult,
+    StressSimulationResponse,
+    LoanRecommendationResponse,
+    CustomerFriendlyFactor,
+    EarlyWarningAlert,
+    FinancialHealthResponse,
+    AuditTrailRecord,
+    AssistantQueryRequest,
+    AssistantQueryResponse,
+    FullNirnayAssessmentResponse
+)
 
 __all__ = [
     "RiskAssessmentRequest",
@@ -17,5 +42,28 @@ __all__ = [
     "ModelInfoResponse",
     "HealthResponse",
     "ErrorDetail",
-    "ErrorResponse"
+    "ErrorResponse",
+    "ConsentItem",
+    "ConsentUpdateRequest",
+    "ConsentStatusResponse",
+    "BankCashFlowData",
+    "UPIDigitalData",
+    "UtilityHistoryData",
+    "TelecomHistoryData",
+    "GSTBusinessData",
+    "TVSRepaymentData",
+    "AlternativeScores",
+    "AlternativeDataProfile",
+    "DigitalTwinDimension",
+    "DigitalTwinResponse",
+    "StressScenarioResult",
+    "StressSimulationResponse",
+    "LoanRecommendationResponse",
+    "CustomerFriendlyFactor",
+    "EarlyWarningAlert",
+    "FinancialHealthResponse",
+    "AuditTrailRecord",
+    "AssistantQueryRequest",
+    "AssistantQueryResponse",
+    "FullNirnayAssessmentResponse"
 ]

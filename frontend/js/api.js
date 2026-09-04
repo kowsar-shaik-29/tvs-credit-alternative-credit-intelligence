@@ -99,6 +99,97 @@ class RiskApiClient {
       throw error;
     }
   }
+
+  // NIRNAY Extended APIs
+
+  async getConsentStatus(customerId = "TVS-CUST-10492") {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/consent?customer_id=${encodeURIComponent(customerId)}`);
+      if (!response.ok) throw new Error(`Consent fetch failed: ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      console.warn("Could not fetch consent:", error);
+      return null;
+    }
+  }
+
+  async updateConsent(sourceId, consentGranted, customerId = "TVS-CUST-10492") {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/consent?customer_id=${encodeURIComponent(customerId)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ source_id: sourceId, consent_granted: consentGranted })
+      });
+      if (!response.ok) throw new Error(`Consent update failed: ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      console.error("Error updating consent:", error);
+      throw error;
+    }
+  }
+
+  async runFullNirnayAssessment(applicationData, customerId = "TVS-CUST-10492") {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/nirnay/full-assessment?customer_id=${encodeURIComponent(customerId)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(applicationData)
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.detail || `Assessment error (${response.status})`);
+      }
+      return data;
+    } catch (error) {
+      console.error("Error during full NIRNAY assessment:", error);
+      throw error;
+    }
+  }
+
+  async runStressTest(applicationData, customerId = "TVS-CUST-10492") {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/stress-test?customer_id=${encodeURIComponent(customerId)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(applicationData)
+      });
+      return await response.json();
+    } catch (error) {
+      console.error("Error in stress test API:", error);
+      throw error;
+    }
+  }
+
+  async listAuditRecords() {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/audit/records`);
+      if (!response.ok) throw new Error(`Audit fetch failed: ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      console.warn("Could not fetch audit records:", error);
+      return [];
+    }
+  }
+
+  async askAssistant(question, applicationData, customerId = "TVS-CUST-10492") {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/assistant/query`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: question,
+          customer_id: customerId,
+          application_data: applicationData
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.detail || "Assistant error");
+      return data;
+    } catch (error) {
+      console.error("Assistant API error:", error);
+      throw error;
+    }
+  }
 }
 
 // Export singleton and configuration
