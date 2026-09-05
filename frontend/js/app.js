@@ -677,18 +677,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderMonitoring(health) {
-    monHealthStatus.textContent = health.health_status;
+    if (!health) return;
+    monHealthStatus.textContent = health.health_status || "Stable";
     monHealthStatus.className = `badge badge-lg ${health.health_status === 'Stable' ? 'badge-success' : (health.health_status === 'Watch' ? 'badge-warning' : 'badge-danger')}`;
-    monTrend.textContent = health.stability_trend;
+    monTrend.textContent = health.stability_trend || "Positive";
 
     monAlertsList.innerHTML = "";
-    health.active_alerts.forEach(alert => {
+    (health.active_alerts || []).forEach(alert => {
       const card = document.createElement("div");
-      const sevClass = alert.severity.toLowerCase().replace(" ", "-");
+      const rawSev = alert.severity || "info";
+      const sevClass = String(rawSev).toLowerCase().replace(/\s+/g, "-");
       card.className = `mon-alert-card ${sevClass}`;
       card.innerHTML = `
-        <strong>${alert.title} (${alert.observed_trend}):</strong> ${alert.description}
-        <div style="margin-top: 4px; color: #475569;"><em>Action: ${alert.recommended_intervention}</em></div>
+        <strong>${escapeHtml(alert.title || "Alert")} (${escapeHtml(alert.observed_trend || "")}):</strong> ${escapeHtml(alert.description || "")}
+        <div style="margin-top: 4px; color: #475569;"><em>Action: ${escapeHtml(alert.recommended_intervention || "Monitor ongoing")}</em></div>
       `;
       monAlertsList.appendChild(card);
     });
@@ -927,15 +929,16 @@ document.addEventListener("DOMContentLoaded", () => {
     levers.forEach(lever => {
       const card = document.createElement("div");
       card.className = "imp-lever-card";
+      const leverTitle = lever.area_name || lever.lever_name || "Improvement Action";
       const tagText = lever.potential_impact_label || (lever.estimated_capacity_uplift ? `+₹${lever.estimated_capacity_uplift.toLocaleString('en-IN')}` : "+₹5,000 Capacity");
-      const descText = Array.isArray(lever.action_steps) ? lever.action_steps.join(". ") : (lever.action_description || "");
-      const metaText = lever.time_to_realize || lever.impact_category || "30-60 Days";
+      const descText = Array.isArray(lever.action_steps) ? lever.action_steps.join(". ") : (lever.action_description || lever.target_recommendation || "");
+      const metaText = lever.timeframe_to_impact || lever.time_to_realize || lever.impact_category || "30-60 Days";
 
       card.innerHTML = `
         <div>
           <div class="imp-header">
             <span>⚡</span>
-            <span>${escapeHtml(lever.lever_name)}</span>
+            <span>${escapeHtml(leverTitle)}</span>
           </div>
           <span class="imp-impact-tag">${escapeHtml(tagText)}</span>
           <p class="imp-desc">${escapeHtml(descText)}</p>
@@ -1305,7 +1308,8 @@ document.addEventListener("DOMContentLoaded", () => {
     alertBox.textContent = "";
   }
 
-  function escapeHtml(str) {
+  function escapeHtml(value) {
+    const str = value == null ? "" : String(value);
     return str.replace(/[&<>'"]/g, tag => ({
       '&': '&amp;',
       '<': '&lt;',
