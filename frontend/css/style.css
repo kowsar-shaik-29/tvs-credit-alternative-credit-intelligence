@@ -1555,3 +1555,855 @@ body {
   }
 }
 
+/* ========================================================================= */
+/* NIRNAY HACKATHON ENHANCEMENTS STYLES                                      */
+/* ========================================================================= */
+
+/* 1. Agent System Architecture Banner */
+.agent-system-badge {
+  margin-top: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  backdrop-filter: blur(4px);
+}
+
+.agent-system-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.agent-system-icon {
+  font-size: 16px;
+}
+
+.agent-system-title {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  color: #f8fafc;
+}
+
+.agent-system-pill {
+  font-size: 10px;
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: auto;
+}
+
+.agent-chips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.agent-chip {
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: default;
+  transition: background 0.2s;
+}
+
+.agent-chip:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+/* 2. Second Chance Structuring Box */
+.second-chance-box {
+  margin-top: 14px;
+  background: #fffbeb;
+  border: 1.5px solid #f59e0b;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.sc-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.sc-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #b45309;
+  background: #fef3c7;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.sc-status-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #065f46;
+  background: #d1fae5;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.second-chance-box h5 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 4px;
+}
+
+.sc-explanation {
+  font-size: 12px;
+  color: #78350f;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.sc-comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.sc-col {
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-size: 12px;
+}
+
+.sc-col-highlight {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.sc-col-title {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.sc-col-highlight .sc-col-title {
+  color: #16a34a;
+}
+
+.sc-stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.sc-stat .sc-label {
+  color: #64748b;
+}
+
+.sc-val-hl {
+  color: #16a34a;
+}
+
+.sc-factors-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.sc-factor-chip {
+  font-size: 11px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  line-height: 1.3;
+}
+
+.sc-factor-chip.positive {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.sc-factor-chip.risk {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.sc-chip-icon {
+  font-weight: 700;
+}
+
+.sc-action-path {
+  font-size: 11px;
+  color: #475569;
+  background: #f8fafc;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid #f59e0b;
+}
+
+/* 3. Financial Health Passport */
+.passport-container {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.passport-card {
+  background: linear-gradient(135deg, #0b2240 0%, #1e3a8a 100%);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.passport-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+}
+
+.passport-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.passport-emblem {
+  background: #c8102e;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.passport-brand h5 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.passport-sub {
+  font-size: 10px;
+  color: #93c5fd;
+}
+
+.passport-badge-wrap {
+  text-align: right;
+}
+
+.passport-tier-badge {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  background: #10b981;
+  color: #ffffff;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.passport-validity {
+  font-size: 10px;
+  color: #cbd5e1;
+}
+
+.passport-dimensions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.passport-dim-item {
+  background: rgba(255, 255, 255, 0.07);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.passport-dim-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 4px;
+  color: #e2e8f0;
+}
+
+.passport-dim-bar-bg {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.passport-dim-bar-fill {
+  height: 100%;
+  background: #34d399;
+  border-radius: 3px;
+}
+
+.passport-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 10px;
+  font-size: 10px;
+  color: #cbd5e1;
+}
+
+.passport-verification {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Evidence Confidence Card */
+.evidence-confidence-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.evidence-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.evidence-header h6 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.evidence-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.confidence-circle {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 3px solid #10b981;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #ecfdf5;
+}
+
+.confidence-val {
+  font-size: 15px;
+  font-weight: 800;
+  color: #065f46;
+  line-height: 1;
+}
+
+.confidence-lbl {
+  font-size: 8px;
+  text-transform: uppercase;
+  color: #047857;
+  font-weight: 600;
+}
+
+.evidence-split {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.evidence-col-title {
+  font-weight: 700;
+  color: #475569;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.evidence-list {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.evidence-list li {
+  padding-left: 12px;
+  position: relative;
+  color: #64748b;
+}
+
+.evidence-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #94a3b8;
+}
+
+/* 4. Interactive What-If Simulator */
+.whatif-container {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.whatif-controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 18px;
+  background: #f8fafc;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+}
+
+.whatif-slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.slider-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.slider-value {
+  color: #0284c7;
+  font-weight: 700;
+}
+
+.whatif-slider {
+  width: 100%;
+  accent-color: #0284c7;
+  cursor: pointer;
+}
+
+.slider-bounds {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.whatif-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.whatif-card {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 12px;
+}
+
+.whatif-card-active {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.whatif-card-rec {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.whatif-card-header {
+  font-weight: 700;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: var(--text-main);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 4px;
+}
+
+.whatif-stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.w-lbl {
+  color: #64748b;
+}
+
+.val-active {
+  color: #1d4ed8;
+}
+
+.whatif-summary-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+/* 5. Credit Improvement Simulator */
+.improvement-container {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.improvement-intro {
+  font-size: 12px;
+  color: #475569;
+  margin-bottom: 14px;
+}
+
+.improvement-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.imp-lever-card {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.imp-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.imp-impact-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+
+.imp-desc {
+  color: #64748b;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.imp-meta {
+  font-size: 10px;
+  color: #94a3b8;
+  border-top: 1px dashed var(--border);
+  padding-top: 4px;
+}
+
+/* 6. 4-Month Post-Disbursal Health Trajectory */
+.timeline-wrapper {
+  margin-top: 18px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.timeline-header h6 {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.timeline-badge {
+  font-size: 10px;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.timeline-card {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-size: 11px;
+  position: relative;
+}
+
+.timeline-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #3b82f6;
+  border-radius: 3px 3px 0 0;
+}
+
+.timeline-month {
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.timeline-trigger {
+  color: var(--text-main);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.timeline-desc {
+  color: #64748b;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.timeline-action {
+  font-size: 10px;
+  color: #047857;
+  background: #ecfdf5;
+  padding: 3px 6px;
+  border-radius: 3px;
+}
+
+/* 7. Fairness & Responsible Lending Dashboard */
+.fairness-card {
+  margin-bottom: 24px;
+}
+
+.fairness-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.fairness-metric-box {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fairness-metric-box .f-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fairness-metric-box .f-val {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.fairness-metric-box .f-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.fairness-segments-table-wrap {
+  overflow-x: auto;
+}
+
+.fairness-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.fairness-table th {
+  background: #f1f5f9;
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.fairness-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* 8. Human-in-the-Loop Review Form */
+.hitl-container {
+  margin-top: 18px;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.hitl-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.hitl-header h5 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.hitl-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.hitl-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.hitl-form label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.hitl-form select,
+.hitl-form input,
+.hitl-form textarea {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+}
+
+.hitl-conditions {
+  margin-bottom: 12px;
+  font-size: 11px;
+}
+
+.hitl-cond-title {
+  font-weight: 600;
+  color: #475569;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.hitl-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hitl-checks label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.hitl-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hitl-feedback {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.hitl-feedback.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* Responsive adjustments for new components */
+@media (max-width: 1024px) {
+  .passport-container,
+  .whatif-controls,
+  .whatif-comparison-grid,
+  .improvement-cards-grid,
+  .timeline-grid,
+  .fairness-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+

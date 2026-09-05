@@ -9,6 +9,7 @@ from app.schemas.nirnay import (
     AlternativeDataProfile,
     LoanRecommendationResponse
 )
+from app.schemas.nirnay_enhancements import SecondChanceRecommendation
 
 
 class RecommendationService:
@@ -108,6 +109,72 @@ class RecommendationService:
             reasoning=reasoning,
             repayment_guardrail=guardrail
         )
+
+    def generate_second_chance(
+        self,
+        request: RiskAssessmentRequest,
+        alt_profile: AlternativeDataProfile,
+        default_prob: float,
+        rec: LoanRecommendationResponse
+    ) -> SecondChanceRecommendation:
+        """Constructs proactive Second Chance restructuring when requested loan terms are unsuitable."""
+        is_suitable = (
+            (default_prob < 0.47) and
+            (rec.affordability_status != "Strained") and
+            (rec.recommended_loan >= request.loan_amount * 0.90)
+        )
+
+        if is_suitable:
+            return SecondChanceRecommendation(
+                is_suitable_at_requested_terms=True,
+                status_label="Suitable at requested terms",
+                headline="Requested borrowing structure aligns with cash flow capacity",
+                requested_amount=round(request.loan_amount, 2),
+                requested_term=request.loan_term,
+                recommended_amount=round(rec.recommended_loan, 2),
+                recommended_term=rec.recommended_tenure_months,
+                recommended_emi=rec.estimated_emi,
+                reason_for_recommendation="Requested exposure is well-supported by regular verified inflows and disposable buffer.",
+                main_risk_factor="Manage continuous payment obligations within scheduled monthly dates.",
+                main_positive_factor=f"Strong alternative payment discipline ({alt_profile.scores.payment_discipline}/100) and moderate leverage.",
+                actionable_path="Fast-track instant digital agreement and NACH e-mandate registration."
+            )
+        else:
+            reasons = []
+            if default_prob >= 0.47:
+                reasons.append("Elevated baseline credit risk")
+            if rec.affordability_status == "Strained":
+                reasons.append("Monthly EMI would exceed safe disposable cash buffer")
+            if request.dti_ratio > 0.50:
+                reasons.append("Existing debt obligations absorb significant portion of monthly earnings")
+
+            reason_str = " & ".join(reasons) if reasons else "Borrowing amount exceeds comfortable debt service ceiling"
+            main_risk = (
+                f"High Debt-to-Income ({int(request.dti_ratio * 100)}%) and requested loan size of ₹{request.loan_amount:,.0f} create repayment strain."
+                if request.dti_ratio > 0.40
+                else f"Requested loan size ₹{request.loan_amount:,.0f} is elevated relative to verified disposable income."
+            )
+            main_pos = (
+                f"Verified alternative payment discipline ({alt_profile.scores.payment_discipline}/100) and consistent utility track record."
+            )
+            actionable = (
+                f"Qualify immediately for ₹{rec.recommended_loan:,.0f} over {rec.recommended_tenure_months} months, or add a co-signer to unlock up to ₹{rec.max_comfortable_loan * 1.3:,.0f}."
+            )
+
+            return SecondChanceRecommendation(
+                is_suitable_at_requested_terms=False,
+                status_label="Not suitable at requested terms",
+                headline="Not suitable at requested terms — TVS Second Chance Structuring Available",
+                requested_amount=round(request.loan_amount, 2),
+                requested_term=request.loan_term,
+                recommended_amount=round(rec.recommended_loan, 2),
+                recommended_term=rec.recommended_tenure_months,
+                recommended_emi=rec.estimated_emi,
+                reason_for_recommendation=f"Why alternative was structured: {reason_str}. Structured to ₹{rec.recommended_loan:,.0f} over {rec.recommended_tenure_months} months to safeguard liquidity.",
+                main_risk_factor=main_risk,
+                main_positive_factor=main_pos,
+                actionable_path=actionable
+            )
 
 
 recommendation_service = RecommendationService()

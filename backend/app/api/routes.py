@@ -31,6 +31,22 @@ from app.schemas.nirnay import (
     AssistantQueryResponse,
     FullNirnayAssessmentResponse
 )
+from app.schemas.nirnay_enhancements import (
+    WhatIfSimulationRequest,
+    WhatIfSimulationResponse,
+    SecondChanceRecommendation,
+    CreditImprovementResponse,
+    FinancialHealthPassport,
+    EvidenceConfidence,
+    FairnessMetricsResponse,
+    HumanReviewRequest,
+    HumanReviewResponse,
+    FinancialHealthTimelineResponse,
+    FinancialCoachQueryRequest,
+    FinancialCoachQueryResponse,
+    NirnayAgentSystemStatus,
+    SpecializedAgentMetadata
+)
 from app.services.feature_engineering import feature_engineering_service
 from app.services.model_service import model_service
 from app.services.risk_service import risk_service
@@ -43,6 +59,9 @@ from app.services.monitoring_service import monitoring_service
 from app.services.audit_service import audit_service
 from app.services.assistant_service import assistant_service
 from app.services.explanation_service import customer_explanation_service
+from app.services.simulation_service import simulation_service
+from app.services.passport_service import passport_service
+from app.services.fairness_service import fairness_service
 
 logger = logging.getLogger("tvs_credit.api")
 
@@ -497,10 +516,28 @@ async def run_full_nirnay_assessment(
         # 6. Stress Simulation (7 scenarios)
         stress_results = stress_service.run_stress_test(request, alt_profile)
 
-        # 7. Continuous Health Monitoring
+        # 7. Continuous Health Monitoring & 4-Month Timeline
         health_eval = monitoring_service.evaluate_health(customer_id, alt_profile, default_prob)
+        health_timeline = monitoring_service.generate_health_timeline(customer_id, alt_profile)
 
-        # 8. Audit Record
+        # 8. Financial Health Passport & Evidence Confidence
+        passport = passport_service.generate_passport(
+            request, alt_profile, stress_results.baseline_resilience, indicators
+        )
+        evidence_confidence = passport_service.evaluate_evidence_confidence(
+            consents, alt_profile, request
+        )
+
+        # 9. Second Chance Structuring & Credit Improvement Roadmap
+        second_chance = recommendation_service.generate_second_chance(
+            request, alt_profile, default_prob, recommendation
+        )
+        credit_improvement = simulation_service.generate_credit_improvement_plan(
+            request, alt_profile, indicators
+        )
+        consent_intel = passport_service.generate_consent_intelligence(consents, customer_id)
+
+        # 10. Audit Record
         app_id = f"TVS-APP-{uuid.uuid4().hex[:8].upper()}"
         consented_list = [c.source_id for c in consents if c.consent_granted]
         audit_record = audit_service.log_assessment(
@@ -531,7 +568,13 @@ async def run_full_nirnay_assessment(
             stress_test=stress_results,
             loan_recommendation=recommendation,
             financial_health=health_eval,
-            audit_record=audit_record
+            audit_record=audit_record,
+            passport=passport,
+            evidence_confidence=evidence_confidence,
+            second_chance=second_chance,
+            health_timeline=health_timeline,
+            consent_intelligence=consent_intel,
+            credit_improvement=credit_improvement
         )
 
     except Exception as e:
@@ -595,3 +638,190 @@ async def query_assistant(query: AssistantQueryRequest):
         resilience_score=resilience,
         rec=rec
     )
+
+
+# =========================================================================
+# NIRNAY 2.5 HACKATHON ENHANCEMENT ENDPOINTS
+# =========================================================================
+
+@api_router.post(
+    "/api/v1/simulator/what-if",
+    response_model=WhatIfSimulationResponse,
+    summary="What-If Loan Scenario Simulator",
+    description="Simulates alternative borrowing parameters (amount, tenure, rate) and provides side-by-side affordability comparison."
+)
+async def simulate_what_if(sim_req: WhatIfSimulationRequest, customer_id: str = "TVS-CUST-10492"):
+    """Evaluate decision-support borrowing trade-offs for different loan sizes and tenures."""
+    req = sim_req.current_request
+    consents = _CUSTOMER_CONSENTS.get(customer_id, alternative_data_service.get_default_consents())
+    alt_profile = alternative_data_service.generate_alternative_profile(req, customer_id, consents)
+
+    default_prob = 0.3933
+    if model_service.is_ready:
+        raw_df = feature_engineering_service.convert_api_to_dataframe(req)
+        df_featured, _ = feature_engineering_service.engineer_features(raw_df)
+        default_prob = model_service.predict_default_probability(df_featured)
+
+    return simulation_service.simulate_what_if(
+        current_request=req,
+        simulated_loan_amount=sim_req.simulated_loan_amount,
+        simulated_loan_term=sim_req.simulated_loan_term,
+        simulated_interest_rate=sim_req.simulated_interest_rate,
+        alt_profile=alt_profile,
+        default_prob=default_prob
+    )
+
+
+@api_router.post(
+    "/api/v1/simulator/credit-improvement",
+    response_model=CreditImprovementResponse,
+    summary="Credit Improvement Roadmap Simulator",
+    description="Returns actionable, non-punitive improvement levers based on live debt and alternative payment indicators."
+)
+async def get_credit_improvement_plan(request: RiskAssessmentRequest, customer_id: str = "TVS-CUST-10492"):
+    """Synthesize personalized improvement recommendations for applicant."""
+    consents = _CUSTOMER_CONSENTS.get(customer_id, alternative_data_service.get_default_consents())
+    alt_profile = alternative_data_service.generate_alternative_profile(request, customer_id, consents)
+
+    raw_df = feature_engineering_service.convert_api_to_dataframe(request)
+    _, indicators = feature_engineering_service.engineer_features(raw_df)
+
+    return simulation_service.generate_credit_improvement_plan(request, alt_profile, indicators)
+
+
+@api_router.get(
+    "/api/v1/analyst/fairness-metrics",
+    response_model=FairnessMetricsResponse,
+    summary="Fairness & Responsible Lending Portfolio Metrics",
+    description="Returns synthetic portfolio-level metrics tracking thin-file inclusion, approval parity, and alternative data coverage."
+)
+async def get_fairness_metrics():
+    """Retrieve responsible lending compliance and demographic parity metrics for Credit Analysts."""
+    return fairness_service.get_portfolio_fairness_metrics()
+
+
+@api_router.post(
+    "/api/v1/analyst/human-review",
+    response_model=HumanReviewResponse,
+    summary="Human-in-the-Loop Review & Decision Override",
+    description="Allows underwriters to approve, decline, or request information with mandatory role, reason, and immutable audit logging."
+)
+async def submit_human_review(review: HumanReviewRequest):
+    """Log an underwriter decision or override without modifying the underlying ML prediction."""
+    return audit_service.record_human_review(
+        application_id=review.application_id,
+        customer_id=review.customer_id,
+        decision=review.decision,
+        override_reason=review.override_reason,
+        analyst_role=review.analyst_role,
+        analyst_notes=review.analyst_notes
+    )
+
+
+@api_router.post(
+    "/api/v1/coach/query",
+    response_model=FinancialCoachQueryResponse,
+    summary="AI Financial Coach Conversational Advice",
+    description="Answers targeted eligibility, affordability, and resilience improvement questions with categorized action steps."
+)
+async def query_financial_coach(query: FinancialCoachQueryRequest):
+    """Answer customer educational questions using live assessment signals."""
+    req = query.application_data
+    if not req:
+        req = RiskAssessmentRequest(
+            age=30,
+            income=50000.0,
+            loan_amount=40000.0,
+            credit_score=650,
+            months_employed=36,
+            num_credit_lines=3,
+            interest_rate=10.0,
+            loan_term=36,
+            dti_ratio=0.30,
+            education="Bachelor's",
+            employment_type="Full-time",
+            marital_status="Single",
+            has_mortgage=False,
+            has_dependents=False,
+            loan_purpose="Home",
+            has_cosigner=False
+        )
+
+    customer_id = query.customer_id or "TVS-CUST-10492"
+    consents = _CUSTOMER_CONSENTS.get(customer_id, alternative_data_service.get_default_consents())
+    alt_profile = alternative_data_service.generate_alternative_profile(req, customer_id, consents)
+
+    default_prob = 0.3933
+    if model_service.is_ready:
+        raw_df = feature_engineering_service.convert_api_to_dataframe(req)
+        df_featured, _ = feature_engineering_service.engineer_features(raw_df)
+        default_prob = model_service.predict_default_probability(df_featured)
+
+    rec = recommendation_service.recommend_loan(req, alt_profile, default_prob)
+    resilience = resilience_service.calculate_resilience(req, alt_profile.scores)
+
+    return assistant_service.answer_coach_query(
+        question=query.question,
+        request=req,
+        alt_profile=alt_profile,
+        default_prob=default_prob,
+        recommended_loan=rec.recommended_loan,
+        resilience_score=resilience,
+        rec=rec
+    )
+
+
+@api_router.get(
+    "/api/v1/agents/status",
+    response_model=NirnayAgentSystemStatus,
+    summary="NIRNAY 7 Specialized Agents Status",
+    description="Returns metadata on the 7 cooperating AI agents orchestrating assessment, resilience, recommendation, and audit."
+)
+async def get_agent_system_status():
+    """Return status and signal scope for the 7 specialized NIRNAY AI agents."""
+    agents = [
+        SpecializedAgentMetadata(
+            agent_id="agent-01-credit-assessment",
+            name="Credit Assessment Agent",
+            role_description="Executes core ML inference via Enhanced Random Forest against the locked 0.47 decision threshold.",
+            key_signals_analyzed=["17 Numerical Features", "7 Categorical Encoded Features", "TreeSHAP Drivers"]
+        ),
+        SpecializedAgentMetadata(
+            agent_id="agent-02-affordability",
+            name="Affordability Agent",
+            role_description="Computes reducing-balance EMI, debt-to-income limits, and verified discretionary cash surpluses.",
+            key_signals_analyzed=["Annual Income", "DTI Ratio", "Existing Debt Outflows", "Net Monthly Surplus"]
+        ),
+        SpecializedAgentMetadata(
+            agent_id="agent-03-resilience",
+            name="Resilience Agent",
+            role_description="Evaluates repayment capacity under 7 adverse economic shock scenarios.",
+            key_signals_analyzed=["Income -10% to -30%", "Expenses +10% to +20%", "Missed Bill Shocks", "Income Pause"]
+        ),
+        SpecializedAgentMetadata(
+            agent_id="agent-04-recommendation",
+            name="Recommendation Agent",
+            role_description="Structures responsible loan amounts and Second Chance alternatives when requested terms are strained.",
+            key_signals_analyzed=["Max Comfortable Loan", "Safe Tenure Extension", "Second Chance Guardrails"]
+        ),
+        SpecializedAgentMetadata(
+            agent_id="agent-05-financial-coach",
+            name="Financial Coach Agent",
+            role_description="Provides personalized guidance and Credit Improvement roadmap levers to build borrowing eligibility.",
+            key_signals_analyzed=["Payment Discipline Roadmap", "DTI Reduction Targets", "Cash Cushion Guidance"]
+        ),
+        SpecializedAgentMetadata(
+            agent_id="agent-06-monitoring",
+            name="Monitoring Agent",
+            role_description="Conducts post-disbursal surveillance across a 4-month simulated health timeline with proactive alerts.",
+            key_signals_analyzed=["4-Month Milestones", "Early Warning Delinquency Triggers", "Flexi-Tenure Options"]
+        ),
+        SpecializedAgentMetadata(
+            agent_id="agent-07-compliance-audit",
+            name="Compliance & Audit Agent",
+            role_description="Maintains immutable decision logs, consent intelligence, evidence confidence, and human-in-the-loop overrides.",
+            key_signals_analyzed=["Consent Status", "Evidence Confidence 0-100", "Underwriter Overrides", "Fairness Metrics"]
+        )
+    ]
+    return NirnayAgentSystemStatus(specialized_agents=agents)
+

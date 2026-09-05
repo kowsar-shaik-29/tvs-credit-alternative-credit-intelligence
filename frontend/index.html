@@ -73,6 +73,23 @@
       <div class="hero-section">
         <h2>Alternative Data Credit Engine for the Invisible Customer</h2>
         <p>Evaluating repayment capability using consented alternative financial signals (Bank cash flow, UPI, utility and telecom discipline) alongside traditional credit evaluation.</p>
+        <!-- 7 Cooperating AI Agents Architecture Banner -->
+        <div class="agent-system-badge" id="agent-system-badge">
+          <div class="agent-system-header">
+            <span class="agent-system-icon">⚡</span>
+            <span class="agent-system-title">NIRNAY 7-Agent Architecture</span>
+            <span class="agent-system-pill">Active Cooperative Multi-Agent System</span>
+          </div>
+          <div class="agent-chips-grid">
+            <div class="agent-chip" title="Enforces synthetic consent, minimization and governance"><span class="chip-dot"></span> Consent & Privacy Agent</div>
+            <div class="agent-chip" title="Engineers 9 alternative financial signals from UPI, cash-flow, utilities"><span class="chip-dot"></span> Alt Signal Engineering Agent</div>
+            <div class="agent-chip" title="Executes Enhanced Random Forest and Logistic benchmarks"><span class="chip-dot"></span> Risk Modeling Engine</div>
+            <div class="agent-chip" title="Synthesizes multi-dimensional behavioral stability matrix"><span class="chip-dot"></span> Digital Twin & Stability Agent</div>
+            <div class="agent-chip" title="Simulates adverse economic shocks and income pauses"><span class="chip-dot"></span> Stress & Resilience Agent</div>
+            <div class="agent-chip" title="Re-engineers loans to prevent default and unlock approvals"><span class="chip-dot"></span> Second-Chance Structuring Agent</div>
+            <div class="agent-chip" title="Monitors demographic parity, bias, and early warnings"><span class="chip-dot"></span> Fairness & Explainability Agent</div>
+          </div>
+        </div>
       </div>
 
       <div class="dashboard-grid">
@@ -318,9 +335,109 @@
                 <div class="rec-guardrail" id="rec-guardrail">
                   Repayment guardrail active.
                 </div>
+
+                <!-- Second Chance Structuring Sub-Panel -->
+                <div class="second-chance-box hidden" id="second-chance-box">
+                  <div class="sc-badge-row">
+                    <span class="sc-badge">⚡ Second-Chance Structuring Active</span>
+                    <span class="sc-status-label" id="sc-status-label">Structured Alternative Available</span>
+                  </div>
+                  <h5 id="sc-headline">Alternative Loan Restructure</h5>
+                  <p id="sc-explanation" class="sc-explanation"></p>
+                  <div class="sc-comparison-grid">
+                    <div class="sc-col">
+                      <span class="sc-col-title">Requested Terms</span>
+                      <div class="sc-stat"><span class="sc-label">Amount:</span> <strong id="sc-req-amount">₹--</strong></div>
+                      <div class="sc-stat"><span class="sc-label">Tenure:</span> <strong id="sc-req-tenure">-- mo</strong></div>
+                      <div class="sc-stat"><span class="sc-label">Est. EMI:</span> <strong id="sc-req-emi">₹--</strong></div>
+                    </div>
+                    <div class="sc-col sc-col-highlight">
+                      <span class="sc-col-title">Safer Structured Alternative</span>
+                      <div class="sc-stat"><span class="sc-label">Amount:</span> <strong class="sc-val-hl" id="sc-rec-amount">₹--</strong></div>
+                      <div class="sc-stat"><span class="sc-label">Tenure:</span> <strong class="sc-val-hl" id="sc-rec-tenure">-- mo</strong></div>
+                      <div class="sc-stat"><span class="sc-label">Est. EMI:</span> <strong class="sc-val-hl" id="sc-rec-emi">₹--</strong></div>
+                    </div>
+                  </div>
+                  <div class="sc-factors-row">
+                    <div class="sc-factor-chip positive">
+                      <span class="sc-chip-icon">✓</span>
+                      <div><strong>Positive Signal:</strong> <span id="sc-positive-factor">--</span></div>
+                    </div>
+                    <div class="sc-factor-chip risk">
+                      <span class="sc-chip-icon">⚠</span>
+                      <div><strong>Primary Constraint:</strong> <span id="sc-risk-factor">--</span></div>
+                    </div>
+                  </div>
+                  <div class="sc-action-path">
+                    <strong>Actionable Path to Full Requested Amount:</strong>
+                    <span id="sc-action-path">--</span>
+                  </div>
+                </div>
               </div>
 
-              <!-- 3. Alternative Credit Profile Scores (0-100) -->
+              <!-- 3. Financial Health Passport & Evidence Confidence -->
+              <div class="section-heading">
+                <h4>Financial Health Passport</h4>
+                <span class="tag">Portable Credit Readiness Credential</span>
+              </div>
+
+              <div class="passport-container" id="passport-container">
+                <div class="passport-card">
+                  <div class="passport-header">
+                    <div class="passport-brand">
+                      <div class="passport-emblem">TVS</div>
+                      <div>
+                        <h5>TVS CREDIT FINANCIAL HEALTH PASSPORT</h5>
+                        <span class="passport-sub" id="passport-id">ID: TVS-FHP-000000</span>
+                      </div>
+                    </div>
+                    <div class="passport-badge-wrap">
+                      <span class="passport-tier-badge" id="passport-tier">Credit Ready</span>
+                      <span class="passport-validity" id="passport-validity">Valid: 90 Days</span>
+                    </div>
+                  </div>
+
+                  <div class="passport-dimensions-grid" id="passport-dimensions-grid">
+                    <!-- 6 dimensions rendered dynamically -->
+                  </div>
+
+                  <div class="passport-footer">
+                    <div class="passport-verification">
+                      <span class="verify-icon">🛡️</span>
+                      <span>Consented Alternative Data Verified • Cryptographically Sealed Prototype</span>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="btn-share-passport" onclick="alert('Demo Action: Financial Health Passport credential exported and copied to clipboard!')">
+                      🔗 Share Credential
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Evidence Confidence Meter -->
+                <div class="evidence-confidence-card" id="evidence-confidence-card">
+                  <div class="evidence-header">
+                    <div>
+                      <h6>Evidence Confidence Score</h6>
+                      <p class="evidence-sub">Alternative data verification depth & signal richness</p>
+                    </div>
+                    <div class="confidence-circle" id="confidence-circle">
+                      <span class="confidence-val" id="confidence-score">--</span>
+                      <span class="confidence-lbl">Confidence</span>
+                    </div>
+                  </div>
+                  <div class="evidence-split">
+                    <div class="evidence-col">
+                      <span class="evidence-col-title">✓ Strong Evidence Areas</span>
+                      <ul id="evidence-strong-list" class="evidence-list"></ul>
+                    </div>
+                    <div class="evidence-col">
+                      <span class="evidence-col-title">ℹ Limited Evidence Areas</span>
+                      <ul id="evidence-limited-list" class="evidence-list"></ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. Alternative Credit Profile Scores (0-100) -->
               <div class="section-heading">
                 <h4>Alternative Credit Profile</h4>
                 <span class="tag">Consented Signal Scores (0–100)</span>
@@ -364,7 +481,96 @@
                 </div>
               </div>
 
-              <!-- 5. Customer-Friendly Explainability Factors -->
+              <!-- Interactive "What-If" Loan Simulator -->
+              <div class="section-heading">
+                <h4>Interactive "What-If" Loan Simulator</h4>
+                <span class="tag">Instant Eligibility Re-computation</span>
+              </div>
+
+              <div class="whatif-container" id="whatif-container">
+                <div class="whatif-controls">
+                  <div class="whatif-slider-group">
+                    <div class="slider-label-row">
+                      <label for="whatif-amount">Simulated Loan Amount</label>
+                      <span class="slider-value" id="whatif-amount-val">₹40,000</span>
+                    </div>
+                    <input type="range" id="whatif-amount" min="5000" max="200000" step="1000" value="40000" class="whatif-slider">
+                    <div class="slider-bounds"><span>₹5,000</span><span>₹2,00,000</span></div>
+                  </div>
+
+                  <div class="whatif-slider-group">
+                    <div class="slider-label-row">
+                      <label for="whatif-tenure">Simulated Loan Tenure</label>
+                      <span class="slider-value" id="whatif-tenure-val">36 Months</span>
+                    </div>
+                    <input type="range" id="whatif-tenure" min="6" max="60" step="3" value="36" class="whatif-slider">
+                    <div class="slider-bounds"><span>6 Mo</span><span>60 Mo</span></div>
+                  </div>
+
+                  <div class="whatif-slider-group">
+                    <div class="slider-label-row">
+                      <label for="whatif-rate">Interest Rate (%)</label>
+                      <span class="slider-value" id="whatif-rate-val">10.0%</span>
+                    </div>
+                    <input type="range" id="whatif-rate" min="8.0" max="26.0" step="0.5" value="10.0" class="whatif-slider">
+                    <div class="slider-bounds"><span>8.0%</span><span>26.0%</span></div>
+                  </div>
+                </div>
+
+                <!-- Side-by-side comparison cards -->
+                <div class="whatif-comparison-grid">
+                  <!-- Column 1: Current Request -->
+                  <div class="whatif-card">
+                    <div class="whatif-card-header">Current Application</div>
+                    <div class="whatif-stat"><span class="w-lbl">Amount:</span> <strong id="wi-curr-amt">₹--</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">Tenure:</span> <strong id="wi-curr-ten">-- mo</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">Est. EMI:</span> <strong id="wi-curr-emi">₹--</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">DTI Ratio:</span> <strong id="wi-curr-dti">--%</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">Stress Level:</span> <span class="badge" id="wi-curr-stress">--</span></div>
+                  </div>
+
+                  <!-- Column 2: Simulated (Active Sliders) -->
+                  <div class="whatif-card whatif-card-active">
+                    <div class="whatif-card-header">⚡ Live Simulated Scenario</div>
+                    <div class="whatif-stat"><span class="w-lbl">Amount:</span> <strong class="val-active" id="wi-sim-amt">₹--</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">Tenure:</span> <strong class="val-active" id="wi-sim-ten">-- mo</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">Est. EMI:</span> <strong class="val-active" id="wi-sim-emi">₹--</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">Simulated DTI:</span> <strong class="val-active" id="wi-sim-dti">--%</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">Stress Level:</span> <span class="badge badge-success" id="wi-sim-stress">Low</span></div>
+                  </div>
+
+                  <!-- Column 3: Recommended Safe Option -->
+                  <div class="whatif-card whatif-card-rec">
+                    <div class="whatif-card-header">💡 Recommended Safe Option</div>
+                    <div class="whatif-stat"><span class="w-lbl">Amount:</span> <strong id="wi-rec-amt">₹--</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">Tenure:</span> <strong id="wi-rec-ten">-- mo</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">Est. EMI:</span> <strong id="wi-rec-emi">₹--</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">DTI Ratio:</span> <strong id="wi-rec-dti">--%</strong></div>
+                    <div class="whatif-stat"><span class="w-lbl">Affordability:</span> <span class="badge badge-success" id="wi-rec-stress">Comfortable</span></div>
+                  </div>
+                </div>
+
+                <div class="whatif-summary-note" id="whatif-summary-note">
+                  Adjust sliders to test how varying loan terms and principal amounts modify your monthly commitment and debt-to-income cushion.
+                </div>
+              </div>
+
+              <!-- Credit Improvement Simulator -->
+              <div class="section-heading">
+                <h4>Credit Improvement Simulator</h4>
+                <span class="tag">Actionable Levers for Higher Eligibility</span>
+              </div>
+
+              <div class="improvement-container" id="improvement-container">
+                <div class="improvement-intro">
+                  <p>NIRNAY analyzes your alternative financial footprint to outline clear, non-predatory behavioral steps that expand borrowing power from <strong><span id="imp-current-cap">₹--</span></strong> up to <strong><span id="imp-projected-cap" class="text-success">₹--</span></strong>.</p>
+                </div>
+                <div class="improvement-cards-grid" id="improvement-cards-grid">
+                  <!-- 5 Lever Cards rendered dynamically -->
+                </div>
+              </div>
+
+              <!-- 7. Customer-Friendly Explainability Factors -->
               <div class="section-heading">
                 <h4>Why This Decision? (Explainable Factors)</h4>
                 <span class="tag">Transparent Decision Factors</span>
@@ -452,6 +658,17 @@
                 <div class="mon-alerts-list" id="mon-alerts-list">
                   <!-- Dynamic early warning alerts -->
                 </div>
+
+                <!-- 4-Month Post-Disbursal Health Trajectory -->
+                <div class="timeline-wrapper">
+                  <div class="timeline-header">
+                    <h6>4-Month Post-Disbursal Health Trajectory</h6>
+                    <span class="timeline-badge">Predictive Early Warning Surveillance</span>
+                  </div>
+                  <div class="timeline-grid" id="timeline-grid">
+                    <!-- 4 Milestones rendered dynamically -->
+                  </div>
+                </div>
               </div>
 
               <!-- 8. Preserved Proprietary Alternative Credit Indicators (8 formulas) -->
@@ -538,6 +755,9 @@
           <button type="button" class="prompt-chip" data-question="How much loan can I comfortably afford?">How much loan can I comfortably afford?</button>
           <button type="button" class="prompt-chip" data-question="What happens if my income decreases?">What happens if my income decreases?</button>
           <button type="button" class="prompt-chip" data-question="Why is my recommended loan lower than requested?">Why is my recommended loan lower than requested?</button>
+          <button type="button" class="prompt-chip" data-question="What does my Financial Health Passport mean?">What does my Financial Health Passport mean?</button>
+          <button type="button" class="prompt-chip" data-question="How does alternative data help if I have no credit score?">How does alternative data help if I have no credit score?</button>
+          <button type="button" class="prompt-chip" data-question="What is Second Chance structuring?">What is Second Chance structuring?</button>
         </div>
 
         <div class="assistant-conversation" id="assistant-conversation">
@@ -614,6 +834,58 @@
         </table>
       </div>
 
+      <!-- Fairness & Responsible Lending Dashboard -->
+      <section class="card fairness-card" id="fairness-section">
+        <div class="card-header">
+          <div>
+            <h3>Fairness, Demographic Parity & Responsible Lending Dashboard</h3>
+            <p class="section-desc">Continuous algorithmic bias monitoring, disparate impact audits, and inclusion uplift tracking across thin-file, gig worker, and rural segments.</p>
+          </div>
+          <span class="badge badge-success">Fairness Audited</span>
+        </div>
+
+        <div class="fairness-grid">
+          <div class="fairness-metric-box">
+            <span class="f-label">Thin-File Inclusion Uplift</span>
+            <span class="f-val text-success" id="f-thin-file-uplift">+42.0%</span>
+            <span class="f-sub">Approvals enabled by alternative signals</span>
+          </div>
+          <div class="fairness-metric-box">
+            <span class="f-label">Disparate Impact Ratio</span>
+            <span class="f-val text-primary" id="f-disparate-impact">0.94</span>
+            <span class="f-sub">Complies with 4/5ths rule (&ge; 0.80 benchmark)</span>
+          </div>
+          <div class="fairness-metric-box">
+            <span class="f-label">Demographic Parity Variance</span>
+            <span class="f-val text-success" id="f-demographic-variance">0.038</span>
+            <span class="f-sub">Uniform acceptance spread across segments</span>
+          </div>
+          <div class="fairness-metric-box">
+            <span class="f-label">Explainability & Audit Coverage</span>
+            <span class="f-val text-primary" id="f-explainability-coverage">100%</span>
+            <span class="f-sub">TreeSHAP & customer-friendly transparency</span>
+          </div>
+        </div>
+
+        <div class="fairness-segments-table-wrap">
+          <table class="fairness-table">
+            <thead>
+              <tr>
+                <th>Applicant Segment</th>
+                <th>Approval Rate (Bureau Only)</th>
+                <th>Approval Rate (NIRNAY)</th>
+                <th>Net Inclusion Uplift</th>
+                <th>Default Rate (Post-Disbursal)</th>
+                <th>Parity Status</th>
+              </tr>
+            </thead>
+            <tbody id="fairness-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- Detail Inspection Drawer (Shown when row clicked) -->
       <div id="analyst-detail-drawer" class="card detail-drawer hidden">
         <div class="drawer-header">
@@ -625,6 +897,55 @@
         </div>
         <div class="drawer-content" id="drawer-content">
           <!-- Detail content loaded dynamically -->
+        </div>
+
+        <!-- Human-in-the-Loop Review Form -->
+        <div class="hitl-container" id="hitl-container">
+          <div class="hitl-header">
+            <h5>👨‍💼 Human-in-the-Loop Underwriting Review & Override</h5>
+            <span class="badge badge-info">Official Audit Trail</span>
+          </div>
+
+          <form id="hitl-form" class="hitl-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="hitl-decision">Underwriter Decision</label>
+                <select id="hitl-decision" required>
+                  <option value="APPROVE">Approve at Current Terms</option>
+                  <option value="APPROVE_MODIFIED">Approve with Modified Terms (Second Chance)</option>
+                  <option value="MANUAL_REVIEW" selected>Flag for Secondary Verification</option>
+                  <option value="REQUEST_DATA">Request Additional Consented Data</option>
+                  <option value="DECLINE">Decline Application</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="hitl-officer">Underwriting Officer</label>
+                <input type="text" id="hitl-officer" value="Credit Officer R. Sharma (ID: TVS-UW-882)" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="hitl-notes">Underwriter Rationale / Justification Note</label>
+              <textarea id="hitl-notes" rows="2" placeholder="Document behavioral rationale, alternative data verification, or condition rationale..." required>Verified steady UPI cash flow and clean 12-month utility payment record offsetting thin credit file.</textarea>
+            </div>
+
+            <div class="hitl-conditions">
+              <span class="hitl-cond-title">Enforce Disbursal Conditions:</span>
+              <div class="hitl-checks">
+                <label><input type="checkbox" id="cond-nach" checked> Auto-debit NACH Mandate</label>
+                <label><input type="checkbox" id="cond-cosigner"> Co-Signer Required</label>
+                <label><input type="checkbox" id="cond-cap"> Cap Loan to Max Safe Buffer</label>
+                <label><input type="checkbox" id="cond-monitoring" checked> Proactive 30-day Health Monitoring</label>
+              </div>
+            </div>
+
+            <div class="hitl-actions">
+              <button type="submit" class="btn btn-primary btn-sm" id="btn-submit-hitl">
+                ✓ Record Official Human Decision & Log Audit Trail
+              </button>
+              <div id="hitl-feedback" class="hitl-feedback hidden"></div>
+            </div>
+          </form>
         </div>
       </div>
     </div>

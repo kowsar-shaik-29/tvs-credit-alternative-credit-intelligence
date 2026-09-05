@@ -194,6 +194,103 @@ class RiskApiClient {
       throw error;
     }
   }
+
+  // NIRNAY 2.5 Enhancement APIs
+
+  async runWhatIfSimulation(applicationData, simLoanAmount, simLoanTerm, simInterestRate, customerId = "TVS-CUST-10492") {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/simulator/what-if?customer_id=${encodeURIComponent(customerId)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          current_request: applicationData,
+          simulated_loan_amount: parseFloat(simLoanAmount),
+          simulated_loan_term: parseInt(simLoanTerm, 10),
+          simulated_interest_rate: parseFloat(simInterestRate)
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.detail || "Simulation error");
+      return data;
+    } catch (error) {
+      console.error("What-If Simulator API error:", error);
+      throw error;
+    }
+  }
+
+  async getCreditImprovementPlan(applicationData, customerId = "TVS-CUST-10492") {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/simulator/credit-improvement?customer_id=${encodeURIComponent(customerId)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(applicationData)
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.detail || "Credit improvement error");
+      return data;
+    } catch (error) {
+      console.error("Credit improvement API error:", error);
+      throw error;
+    }
+  }
+
+  async getFairnessMetrics() {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/analyst/fairness-metrics`);
+      if (!response.ok) throw new Error(`Fairness metrics failed: ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      console.warn("Could not fetch fairness metrics:", error);
+      return null;
+    }
+  }
+
+  async submitHumanReview(reviewPayload) {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/analyst/human-review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reviewPayload)
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.detail || "Human review error");
+      return data;
+    } catch (error) {
+      console.error("Human review API error:", error);
+      throw error;
+    }
+  }
+
+  async queryFinancialCoach(question, applicationData, customerId = "TVS-CUST-10492") {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/coach/query`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: question,
+          customer_id: customerId,
+          application_data: applicationData
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.detail || "Coach error");
+      return data;
+    } catch (error) {
+      console.error("Coach API error:", error);
+      throw error;
+    }
+  }
+
+  async getAgentSystemStatus() {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/agents/status`);
+      if (!response.ok) throw new Error(`Agents status failed: ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      console.warn("Could not fetch agents status:", error);
+      return null;
+    }
+  }
 }
 
 // Export singleton and configuration

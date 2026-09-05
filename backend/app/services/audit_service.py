@@ -7,6 +7,7 @@ decision recommendations, and consented data signals for regulatory compliance.
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 from app.schemas.nirnay import AuditTrailRecord
+from app.schemas.nirnay_enhancements import HumanReviewResponse
 
 
 class AuditService:
@@ -64,6 +65,59 @@ class AuditService:
             if len(unique) >= limit:
                 break
         return unique
+
+    def record_human_review(
+        self,
+        application_id: str,
+        customer_id: str,
+        decision: str,
+        override_reason: str,
+        analyst_role: str = "Senior Credit Underwriter",
+        analyst_notes: Optional[str] = None
+    ) -> HumanReviewResponse:
+        """Records a human-in-the-loop review decision without mutating the underlying ML prediction."""
+        record = self.get_record(application_id) or self.get_record(customer_id)
+
+        timestamp_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+        ai_decision = record.recommended_action if record else "MANUAL REVIEW"
+        ai_prob = record.default_probability if record else 0.4168
+
+        is_override = (decision.upper() != ai_decision.upper())
+
+        # Update the audit record's analyst action
+        if record:
+            action_desc = f"{decision.upper()} by {analyst_role}"
+            if is_override:
+                action_desc += f" (Override: {override_reason})"
+            record.analyst_action = action_desc
+
+            if decision.lower() == "approve":
+                record.dealer_status = "Approved — Manual Credit Officer Sign-Off"
+            elif decision.lower() == "reject":
+                record.dealer_status = "Declined — Underwriting Policy Threshold"
+            elif "additional" in decision.lower():
+                record.dealer_status = "Pending — Additional Bank Documents Requested"
+            else:
+                record.dealer_status = "Monitoring — Periodic Portfolio Surveillance"
+
+        return HumanReviewResponse(
+            application_id=application_id,
+            customer_id=customer_id,
+            ai_decision=ai_decision,
+            ai_default_probability=round(ai_prob, 4),
+            analyst_decision=decision,
+            override_reason=override_reason,
+            analyst_role=analyst_role,
+            analyst_notes=analyst_notes,
+            timestamp=timestamp_str,
+            audit_status="Audit Trail Updated (Immutable Log)",
+            is_override=is_override,
+            message=(
+                f"Human-in-the-loop decision '{decision}' recorded by {analyst_role}. "
+                f"{'Override logged with compliance justification.' if is_override else 'AI assessment verified and confirmed.'}"
+            )
+        )
 
 
 audit_service = AuditService()

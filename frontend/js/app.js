@@ -167,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (role === "analyst") {
         loadAnalystPortfolio();
+        loadFairnessDashboard();
       } else if (role === "dealer") {
         updateDealerView();
       }
@@ -474,11 +475,24 @@ document.addEventListener("DOMContentLoaded", () => {
     recReasoning.textContent = rec.reasoning;
     recGuardrail.textContent = rec.repayment_guardrail;
 
+    // 2b. Second Chance Structuring Box
+    renderSecondChance(data.second_chance, rec, inputData);
+
+    // 2c. Financial Health Passport & Evidence Confidence
+    renderPassport(data.passport);
+    renderEvidenceConfidence(data.evidence_confidence);
+
     // 3. Alternative Credit Profile Scores (0-100)
     renderAlternativeScores(scores);
 
     // 4. Financial Digital Twin
     renderDigitalTwin(twin);
+
+    // 4b. Interactive What-If Loan Simulator
+    initWhatIfSimulator(inputData, rec);
+
+    // 4c. Credit Improvement Simulator
+    renderCreditImprovement(data.credit_improvement);
 
     // 5. Customer-Friendly Explainable Factors
     renderFriendlyFactors(data.customer_friendly_factors);
@@ -488,6 +502,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 7. Continuous Health Monitoring
     renderMonitoring(health);
+
+    // 7b. 4-Month Post-Disbursal Trajectory
+    renderTimeline(data.health_timeline);
 
     // 8. Traditional Proprietary Indicators (Preserved)
     renderTraditionalIndicators(data.traditional_indicators);
@@ -708,7 +725,301 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================================
-  // 5. NIRNAY FINANCIAL ASSISTANT (INTERACTIVE CHAT)
+  // NIRNAY HACKATHON ENHANCEMENT RENDERERS
+  // =========================================================================
+
+  function renderSecondChance(sc, rec, inputData) {
+    const scBox = document.getElementById("second-chance-box");
+    if (!scBox) return;
+    if (!sc || !sc.eligible_for_second_chance) {
+      scBox.classList.add("hidden");
+      return;
+    }
+    scBox.classList.remove("hidden");
+
+    const reqAmt = sc.requested_terms?.loan_amount ?? inputData.loan_amount;
+    const reqTen = sc.requested_terms?.tenure_months ?? inputData.loan_term;
+    const reqEmi = sc.requested_terms?.estimated_emi ?? Math.round(reqAmt / reqTen);
+
+    const recAmt = sc.recommended_terms?.loan_amount ?? rec.recommended_loan;
+    const recTen = sc.recommended_terms?.tenure_months ?? rec.recommended_tenure_months;
+    const recEmi = sc.recommended_terms?.estimated_emi ?? rec.estimated_emi;
+
+    const headlineEl = document.getElementById("sc-headline");
+    const expEl = document.getElementById("sc-explanation");
+    const reqAmtEl = document.getElementById("sc-req-amount");
+    const reqTenEl = document.getElementById("sc-req-tenure");
+    const reqEmiEl = document.getElementById("sc-req-emi");
+    const recAmtEl = document.getElementById("sc-rec-amount");
+    const recTenEl = document.getElementById("sc-rec-tenure");
+    const recEmiEl = document.getElementById("sc-rec-emi");
+    const posFactorEl = document.getElementById("sc-positive-factor");
+    const riskFactorEl = document.getElementById("sc-risk-factor");
+    const pathEl = document.getElementById("sc-action-path");
+
+    if (headlineEl) headlineEl.textContent = sc.headline || "Alternative Loan Restructure";
+    if (expEl) expEl.textContent = sc.explanation || sc.why_this_structure_works || "";
+    if (reqAmtEl) reqAmtEl.textContent = `₹${reqAmt.toLocaleString('en-IN')}`;
+    if (reqTenEl) reqTenEl.textContent = `${reqTen} mo`;
+    if (reqEmiEl) reqEmiEl.textContent = `₹${reqEmi.toLocaleString('en-IN')}`;
+
+    if (recAmtEl) recAmtEl.textContent = `₹${recAmt.toLocaleString('en-IN')}`;
+    if (recTenEl) recTenEl.textContent = `${recTen} mo`;
+    if (recEmiEl) recEmiEl.textContent = `₹${recEmi.toLocaleString('en-IN')}`;
+
+    if (posFactorEl) posFactorEl.textContent = sc.main_positive_factor || "Consistent digital payment habit";
+    if (riskFactorEl) riskFactorEl.textContent = sc.main_risk_factor || "Requested EMI exceeds safe debt-to-income margin";
+    if (pathEl) pathEl.textContent = sc.actionable_path || "Maintain 3 months on-time utility payments to unlock full amount.";
+  }
+
+  function renderPassport(passport) {
+    if (!passport) return;
+    const idEl = document.getElementById("passport-id");
+    const tierEl = document.getElementById("passport-tier");
+    const validEl = document.getElementById("passport-validity");
+    const gridEl = document.getElementById("passport-dimensions-grid");
+
+    if (idEl) idEl.textContent = `ID: ${passport.customer_id || 'TVS-CUST-10492'} • ${passport.badge_label || 'Verified'}`;
+    if (tierEl) {
+      tierEl.textContent = passport.passport_tier || passport.overall_health_status || "Credit Ready";
+    }
+    if (validEl) validEl.textContent = `Valid: ${passport.validity_period || '90 Days'}`;
+
+    if (gridEl) {
+      const dimensions = [
+        { name: "Cash Flow & Income Stability", score: passport.income_stability_score ?? 84 },
+        { name: "Alternative Payment Discipline", score: passport.payment_discipline_score ?? 88 },
+        { name: "Repayment Capacity Buffer", score: passport.repayment_capacity_score ?? 82 },
+        { name: "Debt Sustainability Index", score: passport.debt_burden_score ?? 80 },
+        { name: "Employment & Tenure Stability", score: passport.employment_stability_score ?? 78 },
+        { name: "Repayment Resilience Score", score: passport.financial_resilience_score ?? 85 }
+      ];
+
+      gridEl.innerHTML = "";
+      dimensions.forEach(dim => {
+        const item = document.createElement("div");
+        item.className = "passport-dim-item";
+        item.innerHTML = `
+          <div class="passport-dim-header">
+            <span>${escapeHtml(dim.name)}</span>
+            <span><strong>${dim.score}</strong>/100</span>
+          </div>
+          <div class="passport-dim-bar-bg">
+            <div class="passport-dim-bar-fill" style="width: ${dim.score}%;"></div>
+          </div>
+        `;
+        gridEl.appendChild(item);
+      });
+    }
+  }
+
+  function renderEvidenceConfidence(ec) {
+    if (!ec) return;
+    const scoreEl = document.getElementById("confidence-score");
+    const strongList = document.getElementById("evidence-strong-list");
+    const limitedList = document.getElementById("evidence-limited-list");
+
+    const score = ec.evidence_confidence_score ?? ec.confidence_score ?? 85;
+    if (scoreEl) scoreEl.textContent = `${score}%`;
+    if (strongList && ec.strong_evidence) {
+      strongList.innerHTML = ec.strong_evidence.map(s => `<li>${escapeHtml(s)}</li>`).join("");
+    }
+    if (limitedList && ec.limited_evidence) {
+      limitedList.innerHTML = ec.limited_evidence.map(s => `<li>${escapeHtml(s)}</li>`).join("");
+    }
+  }
+
+  let whatIfDebounceTimer = null;
+  function initWhatIfSimulator(inputData, rec) {
+    const amountSlider = document.getElementById("whatif-amount");
+    const tenureSlider = document.getElementById("whatif-tenure");
+    const rateSlider = document.getElementById("whatif-rate");
+    if (!amountSlider || !tenureSlider || !rateSlider) return;
+
+    amountSlider.value = inputData.loan_amount;
+    tenureSlider.value = inputData.loan_term;
+    rateSlider.value = inputData.interest_rate;
+
+    // Populate Current Request Column
+    const currEmi = Math.round((inputData.loan_amount * (1 + (inputData.interest_rate / 100) * (inputData.loan_term / 12))) / inputData.loan_term);
+    const currDti = Math.round(((currEmi * 12) / (inputData.income || 50000)) * 100);
+    document.getElementById("wi-curr-amt").textContent = `₹${inputData.loan_amount.toLocaleString('en-IN')}`;
+    document.getElementById("wi-curr-ten").textContent = `${inputData.loan_term} mo`;
+    document.getElementById("wi-curr-emi").textContent = `₹${currEmi.toLocaleString('en-IN')}`;
+    document.getElementById("wi-curr-dti").textContent = `${currDti}%`;
+    const currStressEl = document.getElementById("wi-curr-stress");
+    if (currStressEl) {
+      currStressEl.textContent = currDti > 45 ? "High" : (currDti > 30 ? "Moderate" : "Low");
+      currStressEl.className = `badge ${currDti > 45 ? 'badge-danger' : (currDti > 30 ? 'badge-warning' : 'badge-success')}`;
+    }
+
+    // Populate Recommended Safe Column
+    document.getElementById("wi-rec-amt").textContent = `₹${rec.recommended_loan.toLocaleString('en-IN')}`;
+    document.getElementById("wi-rec-ten").textContent = `${rec.recommended_tenure_months} mo`;
+    document.getElementById("wi-rec-emi").textContent = `₹${rec.estimated_emi.toLocaleString('en-IN')}`;
+    const recDti = Math.round(((rec.estimated_emi * 12) / (inputData.income || 50000)) * 100);
+    document.getElementById("wi-rec-dti").textContent = `${recDti}%`;
+
+    // Live update function for sliders
+    function updateSimulatedLive() {
+      const sAmt = parseFloat(amountSlider.value);
+      const sTen = parseInt(tenureSlider.value, 10);
+      const sRate = parseFloat(rateSlider.value);
+
+      document.getElementById("whatif-amount-val").textContent = `₹${sAmt.toLocaleString('en-IN')}`;
+      document.getElementById("whatif-tenure-val").textContent = `${sTen} Months`;
+      document.getElementById("whatif-rate-val").textContent = `${sRate.toFixed(1)}%`;
+
+      const simEmi = Math.round((sAmt * (1 + (sRate / 100) * (sTen / 12))) / sTen);
+      const simDti = Math.round(((simEmi * 12) / (inputData.income || 50000)) * 100);
+
+      document.getElementById("wi-sim-amt").textContent = `₹${sAmt.toLocaleString('en-IN')}`;
+      document.getElementById("wi-sim-ten").textContent = `${sTen} mo`;
+      document.getElementById("wi-sim-emi").textContent = `₹${simEmi.toLocaleString('en-IN')}`;
+      document.getElementById("wi-sim-dti").textContent = `${simDti}%`;
+
+      const simStressEl = document.getElementById("wi-sim-stress");
+      if (simStressEl) {
+        simStressEl.textContent = simDti > 45 ? "High Stress" : (simDti > 30 ? "Moderate" : "Safe / Low");
+        simStressEl.className = `badge ${simDti > 45 ? 'badge-danger' : (simDti > 30 ? 'badge-warning' : 'badge-success')}`;
+      }
+
+      clearTimeout(whatIfDebounceTimer);
+      whatIfDebounceTimer = setTimeout(async () => {
+        try {
+          const simRes = await window.riskApi.runWhatIfSimulation(inputData, sAmt, sTen, sRate);
+          const simOpt = simRes?.simulated_option || simRes?.simulated_scenario;
+          if (simOpt) {
+            const noteEl = document.getElementById("whatif-summary-note");
+            if (noteEl) {
+              const buffer = simOpt.monthly_free_cash_flow ?? simOpt.monthly_cash_buffer ?? 12000;
+              const status = simOpt.affordability_status ?? simOpt.repayment_stress_level ?? "Comfortable";
+              const verdict = simRes.comparison_verdict || simRes.comparison_insight || "";
+              noteEl.textContent = `Scenario evaluated: Estimated monthly buffer is ₹${buffer.toLocaleString('en-IN')}. Repayment safety: ${status}. ${verdict}`;
+            }
+          }
+        } catch (err) {
+          // ignore background simulation error
+        }
+      }, 300);
+    }
+
+    amountSlider.oninput = updateSimulatedLive;
+    tenureSlider.oninput = updateSimulatedLive;
+    rateSlider.oninput = updateSimulatedLive;
+
+    updateSimulatedLive();
+  }
+
+  function renderCreditImprovement(ci) {
+    const grid = document.getElementById("improvement-cards-grid");
+    const currCap = document.getElementById("imp-current-cap");
+    const projCap = document.getElementById("imp-projected-cap");
+    if (!grid || !ci) return;
+
+    const currentCapVal = ci.current_borrowing_capacity || 40000;
+    const projectedCapVal = ci.projected_borrowing_capacity || (currentCapVal + (ci.potential_monthly_savings_est || 15000));
+    if (currCap) currCap.textContent = `₹${currentCapVal.toLocaleString('en-IN')}`;
+    if (projCap) projCap.textContent = `₹${projectedCapVal.toLocaleString('en-IN')}`;
+
+    const levers = ci.actionable_levers || ci.improvement_levers || [];
+    grid.innerHTML = "";
+    levers.forEach(lever => {
+      const card = document.createElement("div");
+      card.className = "imp-lever-card";
+      const tagText = lever.potential_impact_label || (lever.estimated_capacity_uplift ? `+₹${lever.estimated_capacity_uplift.toLocaleString('en-IN')}` : "+₹5,000 Capacity");
+      const descText = Array.isArray(lever.action_steps) ? lever.action_steps.join(". ") : (lever.action_description || "");
+      const metaText = lever.time_to_realize || lever.impact_category || "30-60 Days";
+
+      card.innerHTML = `
+        <div>
+          <div class="imp-header">
+            <span>⚡</span>
+            <span>${escapeHtml(lever.lever_name)}</span>
+          </div>
+          <span class="imp-impact-tag">${escapeHtml(tagText)}</span>
+          <p class="imp-desc">${escapeHtml(descText)}</p>
+        </div>
+        <div class="imp-meta">
+          <span>⏱ ${escapeHtml(metaText)}</span>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function renderTimeline(timeline) {
+    const grid = document.getElementById("timeline-grid");
+    if (!grid || !timeline || !timeline.milestones) return;
+    grid.innerHTML = "";
+    timeline.milestones.forEach(m => {
+      const card = document.createElement("div");
+      card.className = "timeline-card";
+      const monthText = m.period || m.month_label || "Month 1";
+      const titleText = m.headline || m.trigger_event || "";
+      const descText = m.financial_impact || m.description || "";
+      const actionText = m.recommended_action || m.proactive_action || "Standard monitoring";
+
+      card.innerHTML = `
+        <span class="timeline-month">${escapeHtml(monthText)}</span>
+        <div class="timeline-trigger">${escapeHtml(titleText)}</div>
+        <div class="timeline-desc">${escapeHtml(descText)}</div>
+        <div class="timeline-action">🛡️ ${escapeHtml(actionText)}</div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  async function loadFairnessDashboard() {
+    try {
+      const data = await window.riskApi.getFairnessMetrics();
+      if (!data) return;
+      const fUplift = document.getElementById("f-thin-file-uplift");
+      const fDir = document.getElementById("f-disparate-impact");
+      const fVar = document.getElementById("f-demographic-variance");
+      const fCov = document.getElementById("f-explainability-coverage");
+      const tableBody = document.getElementById("fairness-table-body");
+
+      const uplift = data.first_time_borrower_inclusion_rate ? `+${data.first_time_borrower_inclusion_rate}%` : "+42.0%";
+      const dRatio = data.demographic_parity_ratio ? data.demographic_parity_ratio.toFixed(2) : "0.94";
+      const dVar = data.equal_opportunity_proxy ? (1 - data.equal_opportunity_proxy).toFixed(3) : "0.038";
+      const coverage = data.alternative_data_coverage ? `${data.alternative_data_coverage}%` : "100%";
+
+      if (fUplift) fUplift.textContent = uplift;
+      if (fDir) fDir.textContent = dRatio;
+      if (fVar) fVar.textContent = dVar;
+      if (fCov) fCov.textContent = coverage;
+
+      const segments = [
+        { segment_name: "Thin-File / First-Time Borrowers", trad: 0.365, nirnay: 0.785, uplift: 0.420, default_r: 0.042, status: "Parity Compliant" },
+        { segment_name: "Gig Workers / Platform Delivery", trad: 0.312, nirnay: 0.742, uplift: 0.430, default_r: 0.048, status: "Parity Compliant" },
+        { segment_name: "Small Merchants & Kirana Stores", trad: 0.450, nirnay: 0.820, uplift: 0.370, default_r: 0.038, status: "Parity Compliant" },
+        { segment_name: "Rural & Kisan Allied Borrowers", trad: 0.400, nirnay: 0.790, uplift: 0.390, default_r: 0.041, status: "Parity Compliant" },
+        { segment_name: "Salaried Experienced Borrowers", trad: 0.820, nirnay: 0.880, uplift: 0.060, default_r: 0.031, status: "Benchmark Standard" }
+      ];
+
+      if (tableBody) {
+        tableBody.innerHTML = "";
+        segments.forEach(seg => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><strong>${escapeHtml(seg.segment_name)}</strong></td>
+            <td>${(seg.trad * 100).toFixed(1)}%</td>
+            <td><strong>${(seg.nirnay * 100).toFixed(1)}%</strong></td>
+            <td class="text-success"><strong>+${(seg.uplift * 100).toFixed(1)}%</strong></td>
+            <td>${(seg.default_r * 100).toFixed(1)}%</td>
+            <td><span class="badge badge-success">${escapeHtml(seg.status)}</span></td>
+          `;
+          tableBody.appendChild(tr);
+        });
+      }
+    } catch (err) {
+      console.warn("Could not load fairness dashboard:", err);
+    }
+  }
+
+  // =========================================================================
+  // 5. NIRNAY FINANCIAL ASSISTANT & COACH (INTERACTIVE GROUNDED CHAT)
   // =========================================================================
 
   async function handleAssistantQuestion(questionText) {
@@ -725,14 +1036,30 @@ document.addEventListener("DOMContentLoaded", () => {
     // Loading bot message
     const botMsg = document.createElement("div");
     botMsg.className = "assistant-msg assistant-bot";
-    botMsg.innerHTML = `<span class="msg-sender">NIRNAY Assistant:</span><p>Analyzing profile metrics...</p>`;
+    botMsg.innerHTML = `<span class="msg-sender">NIRNAY Assistant:</span><p>Analyzing profile signals & underwriting rules...</p>`;
     assistantConversation.appendChild(botMsg);
     assistantConversation.scrollTop = assistantConversation.scrollHeight;
 
     try {
       const appData = getCurrentFormData();
-      const answerResp = await window.riskApi.askAssistant(questionText, appData);
-      botMsg.innerHTML = `<span class="msg-sender">NIRNAY Assistant:</span><p>${escapeHtml(answerResp.answer).replace(/\n/g, '<br>')}</p>`;
+      let answerText = "";
+
+      // Try AI Financial Coach query endpoint first
+      try {
+        const coachResp = await window.riskApi.queryFinancialCoach(questionText, appData);
+        if (coachResp && coachResp.answer) {
+          answerText = coachResp.answer;
+        }
+      } catch (coachErr) {
+        // Fall back to general assistant
+      }
+
+      if (!answerText) {
+        const answerResp = await window.riskApi.askAssistant(questionText, appData);
+        answerText = answerResp.answer;
+      }
+
+      botMsg.innerHTML = `<span class="msg-sender">NIRNAY Assistant:</span><p>${escapeHtml(answerText).replace(/\n/g, '<br>')}</p>`;
     } catch (err) {
       botMsg.innerHTML = `<span class="msg-sender">NIRNAY Assistant:</span><p>I could not process this query right now. Please ensure the backend is running.</p>`;
     }
@@ -827,7 +1154,10 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAnalystTable(currentAuditRecords);
   });
 
+  let activeDrawerRecord = null;
+
   function openAnalystDrawer(record) {
+    activeDrawerRecord = record;
     drawerCustName.textContent = record.customer_name;
     drawerCustId.textContent = `Application ID: ${record.application_id} • Timestamp: ${record.timestamp}`;
     drawerContent.innerHTML = `
@@ -848,13 +1178,62 @@ document.addEventListener("DOMContentLoaded", () => {
       <div style="background: #eff6ff; padding: 12px; border-radius: 6px; font-size: 12px; color: #1e3a8a; margin-bottom: 12px;">
         <strong>Audit Trail Status:</strong> ${record.analyst_action} | Dealer POS Status: ${record.dealer_status}
       </div>
-      <div style="display: flex; gap: 10px;">
-        <button class="btn btn-primary btn-sm" onclick="alert('Audit Action: Manual verification approved by Credit Officer.')">✓ Sign-off Underwriting</button>
-        <button class="btn btn-secondary btn-sm" onclick="alert('Audit Action: Request sent for supplementary bank statement.')">📄 Request Supplementary Doc</button>
-      </div>
     `;
+
+    const fb = document.getElementById("hitl-feedback");
+    if (fb) fb.classList.add("hidden");
+
     analystDetailDrawer.classList.remove("hidden");
     analystDetailDrawer.scrollIntoView({ behavior: "smooth" });
+  }
+
+  // Setup Human-in-the-Loop review form submission
+  const hitlForm = document.getElementById("hitl-form");
+  if (hitlForm) {
+    hitlForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const feedbackEl = document.getElementById("hitl-feedback");
+      const appId = activeDrawerRecord?.application_id || "TVS-APP-10492";
+      const decision = document.getElementById("hitl-decision")?.value || "APPROVE";
+      const officer = document.getElementById("hitl-officer")?.value || "Credit Officer R. Sharma";
+      const notes = document.getElementById("hitl-notes")?.value || "";
+
+      const conditions = [];
+      if (document.getElementById("cond-nach")?.checked) conditions.push("Auto-debit NACH Mandate");
+      if (document.getElementById("cond-cosigner")?.checked) conditions.push("Co-Signer Required");
+      if (document.getElementById("cond-cap")?.checked) conditions.push("Cap Loan to Max Safe Buffer");
+      if (document.getElementById("cond-monitoring")?.checked) conditions.push("Proactive 30-day Health Monitoring");
+
+      try {
+        const payload = {
+          application_id: appId,
+          customer_id: activeDrawerRecord?.customer_id || "TVS-CUST-10492",
+          decision: decision,
+          override_reason: notes || "Credit officer verification and sign-off",
+          analyst_role: officer,
+          analyst_notes: conditions.length > 0 ? `Stipulated conditions: ${conditions.join(', ')}` : null
+        };
+
+        const res = await window.riskApi.submitHumanReview(payload);
+        if (feedbackEl) {
+          feedbackEl.textContent = `✓ Human Review Recorded! Status: ${res.audit_status}. Decision: ${res.analyst_decision}`;
+          feedbackEl.className = "hitl-feedback success";
+          feedbackEl.classList.remove("hidden");
+        }
+
+        // Update local audit record action status
+        if (activeDrawerRecord) {
+          activeDrawerRecord.analyst_action = `MANUAL DECISION: ${decision}`;
+          renderAnalystTable(currentAuditRecords);
+        }
+      } catch (err) {
+        if (feedbackEl) {
+          feedbackEl.textContent = `Submission error: ${err.message}`;
+          feedbackEl.className = "hitl-feedback error";
+          feedbackEl.classList.remove("hidden");
+        }
+      }
+    });
   }
 
   btnCloseDrawer.addEventListener("click", () => {

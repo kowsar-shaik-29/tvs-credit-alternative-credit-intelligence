@@ -3,6 +3,14 @@
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
 from app.schemas.risk import RiskAssessmentRequest, RiskAssessmentDetails, AlternativeCreditIndicators, RiskFactor
+from app.schemas.nirnay_enhancements import (
+    FinancialHealthPassport,
+    EvidenceConfidence,
+    SecondChanceRecommendation,
+    FinancialHealthTimelineResponse,
+    ConsentIntelligenceResponse,
+    CreditImprovementResponse
+)
 
 
 # ==========================================
@@ -294,3 +302,10 @@ class FullNirnayAssessmentResponse(BaseModel):
     loan_recommendation: LoanRecommendationResponse
     financial_health: FinancialHealthResponse
     audit_record: AuditTrailRecord
+    # NIRNAY 2.5 Hackathon Enhancements
+    passport: Optional[FinancialHealthPassport] = None
+    evidence_confidence: Optional[EvidenceConfidence] = None
+    second_chance: Optional[SecondChanceRecommendation] = None
+    health_timeline: Optional[FinancialHealthTimelineResponse] = None
+    consent_intelligence: Optional[ConsentIntelligenceResponse] = None
+    credit_improvement: Optional[CreditImprovementResponse] = None

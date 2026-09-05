@@ -10,6 +10,10 @@ from app.schemas.nirnay import (
     EarlyWarningAlert,
     FinancialHealthResponse
 )
+from app.schemas.nirnay_enhancements import (
+    HealthTimelineMilestone,
+    FinancialHealthTimelineResponse
+)
 
 
 class MonitoringService:
@@ -83,6 +87,73 @@ class MonitoringService:
             last_evaluation_period="Current Billing Cycle (Simulated)",
             stability_trend=trend,
             active_alerts=alerts
+        )
+
+    def generate_health_timeline(
+        self,
+        customer_id: str,
+        alt_profile: AlternativeDataProfile
+    ) -> FinancialHealthTimelineResponse:
+        """Generates a 4-month simulated post-disbursal financial health trajectory."""
+        scores = alt_profile.scores
+
+        m1 = HealthTimelineMilestone(
+            period="Month 1",
+            health_status="Stable",
+            headline="Disbursal & Mandate Activation",
+            trigger_event="First scheduled auto-debit cleared successfully on due date.",
+            financial_impact="Bank cash buffer intact; initial debt service ratio established at healthy baseline.",
+            recommended_action="Maintain automated NACH mandate active; continue standard digital receipts."
+        )
+
+        m2_status = "Stable" if scores.payment_discipline >= 60 else "Watch"
+        m2 = HealthTimelineMilestone(
+            period="Month 2",
+            health_status=m2_status,
+            headline="Recurring Digital Inflows Verified",
+            trigger_event="Consistent UPI transactions and utility payments recorded on schedule.",
+            financial_impact="Payment streak builds positive behavioral score (+3.2% stability lift).",
+            recommended_action="Continue timely settlement of recurring telecom and electricity obligations."
+        )
+
+        m3_status = "Watch" if scores.cash_flow_stability < 75 else "Stable"
+        m3 = HealthTimelineMilestone(
+            period="Month 3",
+            health_status=m3_status,
+            headline="Liquidity Buffer Observation",
+            trigger_event="Short 4-day settlement variance observed on one utility invoice.",
+            financial_impact="Cash buffer remains positive (1.3x monthly EMI) despite minor timing friction.",
+            recommended_action="TVS Credit proactive reminder SMS sent 48 hours prior to EMI date to safeguard zero-bounce status."
+        )
+
+        m4_status = "Early Warning" if (scores.debt_burden > 60 or scores.cash_flow_stability < 60) else "Stable"
+        m4_impact = (
+            "Seasonal expenditure pressures slightly tighten disposable headroom."
+            if m4_status == "Early Warning"
+            else "Sustained stability allows automated eligibility for credit line top-up."
+        )
+        m4_action = (
+            "Proactive option to activate TVS Flexi-Tenure (extend by 6 months) if seasonal pressure persists."
+            if m4_status == "Early Warning"
+            else "Fast-track pre-approved top-up loan offer dispatched via customer WhatsApp portal."
+        )
+        m4 = HealthTimelineMilestone(
+            period="Month 4",
+            health_status=m4_status,
+            headline="Quarterly Performance Review",
+            trigger_event="Assessment of 90-day post-disbursal repayment record across all consented feeds.",
+            financial_impact=m4_impact,
+            recommended_action=m4_action
+        )
+
+        return FinancialHealthTimelineResponse(
+            customer_id=customer_id,
+            current_period="Month 1 (Disbursal Active)",
+            milestones=[m1, m2, m3, m4],
+            proactive_guidance=(
+                "NIRNAY Continuous Surveillance uses non-intrusive consented milestones to protect borrower cash flow "
+                "and provide proactive repayment flexibility before formal delinquency occurs."
+            )
         )
 
 
